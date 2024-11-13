@@ -1,0 +1,20 @@
+ /* Set all hyperlinks to the same color */
+a {
+    color: #007BFF;  /* Set to your desired color */
+    text-decoration: none; /* Remove underline */
+}
+
+/* Change color when the user hovers over the link */
+a:hover {
+    color: #0056b3;  /* Change to a darker shade on hover */
+}
+
+/* Change color for visited links */
+a:visited {
+    color: #800080;  /* Set a color for visited links */
+}
+
+/* Change color when the link is active */
+a:active {
+    color: #003366;  /* Set a color for when the link is active (clicked) */
+}
