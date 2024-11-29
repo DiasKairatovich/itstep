@@ -15,10 +15,8 @@ test_images = test_images/255.0 # тестовый набор данных
 model = keras.Sequential([
     # преобразует(переформатирует) формат изображений из двумерного массива (28 на 28 пикселей) в одномерный массив (28 * 28 = 784 пикселей)
     keras.layers.Flatten(input_shape=(28, 28)),
-
     # Полносвязный слой где задается количество нейронов(128), relu(rectified linear unit) метод работы нейронов
     keras.layers.Dense(128, activation='relu'),
-
     # Полносвязный слой последний(output) где количество нейронов(unit) 10, softmax метод камкует все данные в единую картину
     keras.layers.Dense(10, activation='softmax')
 ])
@@ -27,17 +25,26 @@ model = keras.Sequential([
 model.compile(
     # Оптимизатор — именно так модель обновляется на основе данных, которые она видит, и ее функции потерь.
     optimizer='adam',
-
     # Функция потерь — измеряет, насколько точна модель во время обучения. Вы хотите минимизировать эту функцию, чтобы "направить" модель в правильном направлении.
-    loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
     # Метрики — используются для мониторинга этапов обучения и тестирования. В следующем примере используется точность , доля правильно классифицированных изображений.
     metrics=['accuracy']
 )
 
 # Начало обучения
-model.fit(train_images, train_labels, epochs=10)
+model.fit(train_images, train_labels, epochs=5)
 
 # Оценка точности
-test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
-print('\nTest accuracy:', test_acc)
+# test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
+# print('\nTest accuracy:', test_acc)
+
+# Предсказания (predict)
+prediction = model.predict(test_images)
+
+for i in range(5):
+    plt.grid(False)
+    plt.imshow(test_images[i], cmap=plt.cm.binary)
+    plt.xlabel("Actual: " + class_names[test_labels[i]])
+    plt.title("Prediction: " + class_names[np.argmax(prediction[i])]) # выдает самый возможный вариант распознанного обьекта
+    plt.show()
+
