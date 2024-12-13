@@ -57,22 +57,36 @@ def update_payment_status(user_id, status=1):
 # Routes
 @app.route("/")
 def index():
-    return render_template("index.html")
+    # Если нет user_id в сессии, перенаправляем на страницу регистрации/входа
+    if "user_id" not in session:
+        return redirect(url_for("register"))  # Если пользователь уже зарегистрирован, сразу перенаправляем на тест
+    return render_template("index.html")  # Перенаправляем на тест, если пользователь уже зарегистрирован
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    # Если user_id уже есть в сессии, очищаем сессию для принудительной авторизации
+    session.pop("user_id", None)
+
     if request.method == "POST":
         name = request.form["name"]
         email = request.form["email"]
 
-        # Save user to database
-        try:
-            user_id = add_user(name, email)  # Получаем ID нового пользователя
-            session["user_id"] = user_id  # Сохраняем ID в сессии
+        # Проверяем, существует ли пользователь с таким email
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+        user = cursor.fetchone()
+
+        if user:
+            # Если пользователь найден в базе, сохраняем его id в сессии
+            session["user_id"] = user[0]
+            return redirect(url_for("test"))  # Перенаправляем на страницу теста
+        else:
+            # Если пользователь не найден, регистрируем нового
+            user_id = add_user(name, email)
+            session["user_id"] = user_id  # Сохраняем id нового пользователя в сессии
             return redirect(url_for("test"))
-        except sqlite3.IntegrityError:
-            return "Этот email уже зарегистрирован!"
-    return render_template("register.html")
+    return render_template("register.html") # Показываем страницу регистрации/входа
 
 
 @app.route("/test", methods=["GET", "POST"])
@@ -131,9 +145,9 @@ def result():
 
     # Пример правильных ответов (можно хранить их в базе или в отдельном файле)
     correct_answers = {
-        "q1": "A",  # Вопрос 1: правильный ответ "A"
-        "q2": "C",  # Вопрос 2: правильный ответ "C"
-        "q3": "B",  # Вопрос 3: правильный ответ "B"
+        "q1": "A",  # Вопрос 1: ответ "A"
+        "q2": "C",  # Вопрос 2: ответ "C"
+        "q3": "B",  # Вопрос 3: ответ "B"
     }
 
     # Разбираем ответы пользователя (если это строка формата JSON)
