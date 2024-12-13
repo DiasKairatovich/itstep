@@ -14,7 +14,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 from tensorflow.keras import layers
 from tensorflow.keras import losses
 
-dataset = tf.keras.utils.get_file("aclImdb_v1", "/home/dias/PycharmProjects/study/TensorFlow_neural_network/aclImdb_v1", untar=True, cache_dir='.', cache_subdir='')
+dataset = tf.keras.utils.get_file("aclImdb_v1", "/home/dias/PycharmProjects/study/TensorFlow_NN/aclImdb_v1", untar=True, cache_dir='.', cache_subdir='')
 
 dataset_dir = os.path.join(os.path.dirname(dataset), 'aclImdb_v1/aclImdb')
 # print(os.listdir(dataset_dir))
