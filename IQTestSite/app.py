@@ -8,6 +8,7 @@ app.secret_key = "1b77c234efc86907a3edbbf86ba8492f7e4e98548f293cb97ac55fd42444a6
 def init_db():
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,6 +17,19 @@ def init_db():
         payment_status INTEGER DEFAULT 0
     )
     """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS questions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            question_text TEXT NOT NULL,
+            correct_answer TEXT NOT NULL,
+            option_1 TEXT NOT NULL,
+            option_2 TEXT NOT NULL,
+            option_3 TEXT NOT NULL,
+            option_4 TEXT NOT NULL
+        )
+        """)
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS results (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,6 +39,8 @@ def init_db():
         FOREIGN KEY (user_id) REFERENCES users (id)
     )
     """)
+
+
     conn.commit()
     conn.close()
 
