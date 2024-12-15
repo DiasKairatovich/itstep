@@ -9,7 +9,16 @@
 </head>
 <body>
     <h1>Your Results</h1>
-    <p>You scored {{ score }} out of {{ questions|length }}.</p>
+    <p>You scored {{ score }} out of {{ total_questions }}.</p>
+    <ul>
+    {% for question in questions %}
+    <li>
+        {{ question.question }}<br>
+        Your answer: {{ user_answers[question.id | string] }}<br>
+        Correct answer: {{ question.answer }}
+    </li>
+    {% endfor %}
+    </ul>
     <a href="/logout">Logout</a>
 </body>
 </html>

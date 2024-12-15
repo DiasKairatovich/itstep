@@ -4,6 +4,7 @@ from wtforms import StringField, PasswordField, SubmitField, RadioField
 from wtforms.validators import DataRequired, Email
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
+import json
 import os
 
 app = Flask(__name__)
@@ -25,13 +26,19 @@ def init_db():
         CREATE TABLE IF NOT EXISTS results (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
-            score INTEGER NOT NULL,
+            answers TEXT NOT NULL,  -- Stores user answers as JSON
             test_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
         """)
 
 init_db()
+
+questions = [
+        {"id": 1, "question": "What is 2 + 2?", "options": ["3", "4", "5"], "answer": "4"},
+        {"id": 2, "question": "What is the capital of France?", "options": ["Berlin", "London", "Paris"], "answer": "Paris"},
+        {"id": 3, "question": "What is the square root of 9?", "options": ["2", "3", "4"], "answer": "3"},
+    ]
 
 # Forms
 class RegistrationForm(FlaskForm):
@@ -86,36 +93,68 @@ def login():
                 flash("Invalid email or password.", "danger")
     return render_template("login.html", form=form)
 
+def save_result(user_id, answers):
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    # Convert answers dictionary to JSON
+    answers_json = json.dumps(answers)
+    cursor.execute("INSERT INTO results (user_id, answers) VALUES (?, ?)", (user_id, answers_json))
+    conn.commit()
+    conn.close()
+
 @app.route("/test", methods=["GET", "POST"])
 def test():
+    user_id = session.get("user_id")
     if 'user_id' not in session:
         flash("Please log in to take the test.", "warning")
         return redirect(url_for("login"))
 
-    questions = [
-        {"id": 1, "question": "What is 2 + 2?", "options": ["3", "4", "5"], "answer": "4"},
-        {"id": 2, "question": "What is the capital of France?", "options": ["Berlin", "London", "Paris"], "answer": "Paris"},
-        {"id": 3, "question": "What is the square root of 9?", "options": ["2", "3", "4"], "answer": "3"},
-    ]
-
     if request.method == "POST":
-        answers = request.form
-        score = 0
-        for q in questions:
-            if answers.get(f"q{q['id']}") == q['answer']:
-                score += 1
-        with sqlite3.connect("database.db") as conn:
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO results (user_id, score) VALUES (?, ?)", (session['user_id'], score))
-            conn.commit()
-        return redirect(url_for("result", score=score))
+        # Collect user answers
+        answers = {}
+        for question in questions:
+            q_id = str(question["id"])
+            answers[q_id] = request.form.get(q_id)
+
+        # Save answers in the database
+        save_result(user_id, answers)
+        return redirect(url_for("result"))
 
     return render_template("test.html", questions=questions)
 
 @app.route("/result")
 def result():
-    score = request.args.get("score", type=int)
-    return render_template("result.html", score=score)
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("register"))
+
+    # Connect to the database
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    # Retrieve user answers
+    cursor.execute("SELECT answers, test_date FROM results WHERE user_id = ?", (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+
+    if not result:
+        return "Test results not found!"
+
+    answers_json, test_date = result
+    user_answers = json.loads(answers_json)
+
+    # Score calculation
+    score = sum(1 for question in questions if user_answers.get(str(question["id"])) == question["answer"])
+    total_questions = len(questions)
+
+    return render_template(
+        "result.html",
+        score=score,
+        total_questions=total_questions,
+        test_date=test_date,
+        questions=questions,
+        user_answers=user_answers
+    )
 
 @app.route("/logout")
 def logout():
