@@ -13,11 +13,11 @@
 
     <h2>Подробности:</h2>
     <ul>
-        {% for question, correct_answer in correct_answers.items() %}
+        {% for question_id, data in question_data.items() %}
             <li>
-                Вопрос: {{ question }}<br>
-                Ваш ответ: {{ user_answers[question] or "Не ответили" }}<br>
-                Правильный ответ: {{ correct_answer }}
+                <strong>{{ data.text }}</strong><br>
+                Ваш ответ: {{ user_answers[question_id] or "Не ответили" }}<br>
+                Правильный ответ: {{ data.correct }}
             </li>
         {% endfor %}
     </ul>

@@ -1,180 +1,162 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
+import json
 
 app = Flask(__name__)
-app.secret_key = "1b77c234efc86907a3edbbf86ba8492f7e4e98548f293cb97ac55fd42444a657"
+app.secret_key = "1d6d9de2355aad9dae7d543a563153fd2f1c082c6bf788f159f07bd653e21965"
 
-# Initialize database
+# Инициализация базы данных
+DATABASE = "database.db"
+
 def init_db():
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL UNIQUE,
-        payment_status INTEGER DEFAULT 0
-    )
-    """)
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS results (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        answers TEXT NOT NULL,
-        test_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users (id)
-    )
-    """)
-    conn.commit()
-    conn.close()
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        # Create the `users` table
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL
+        )
+        """)
+        # Create the `questions` table
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS questions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            question_text TEXT NOT NULL,
+            correct_answer TEXT NOT NULL,
+            option_1 TEXT NOT NULL,
+            option_2 TEXT NOT NULL,
+            option_3 TEXT NOT NULL,
+            option_4 TEXT NOT NULL
+        )
+        """)
+        # Create the `results` table
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            answers TEXT NOT NULL,
+            test_date TEXT NOT NULL,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
+        """)
+        # Insert initial questions into the `questions` table
+        questions = [
+            (1, "In which year was St. Petersburg founded?", "A", "A: 1703", "B: 1800", "C: 1604", "D: 1750"),
+            (2, "What is the capital of France?", "C", "A: Lyon", "B: Marseille", "C: Paris", "D: Nice"),
+            (3, "Who wrote 'War and Peace'?", "D", "A: Gogol", "B: Chekhov", "C: Pushkin", "D: Tolstoy"),
+            (4, "How many planets are there in the Solar System?", "B", "A: 7", "B: 8", "C: 9", "D: 10"),
+            (5, "What is the capital of Australia?", "D", "A: Sydney", "B: Melbourne", "C: Brisbane", "D: Canberra"),
+        ]
+        # Insert questions if the table is empty
+        cursor.execute("SELECT COUNT(*) FROM questions")
+        if cursor.fetchone()[0] == 0:
+            cursor.executemany("""
+               INSERT INTO questions (id, question_text, correct_answer, option_1, option_2, option_3, option_4)
+               VALUES (?, ?, ?, ?, ?, ?, ?)
+               """, questions)
+        conn.commit()
 
-init_db()
-
-# Helper functions
-def add_user(name, email):
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO users (name, email) VALUES (?, ?)", (name, email))
-    user_id = cursor.lastrowid  # Получаем ID нового пользователя
-    conn.commit()
-    conn.close()
-    return user_id  # Возвращаем ID
-
-def save_result(user_id, answers):
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO results (user_id, answers) VALUES (?, ?)", (user_id, answers))
-    conn.commit()
-    conn.close()
-
-def update_payment_status(user_id, status=1):
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("UPDATE users SET payment_status = ? WHERE id = ?", (status, user_id))
-    conn.commit()
-    conn.close()
-
-# Routes
+# Главная страница
 @app.route("/")
 def index():
-    # Если нет user_id в сессии, перенаправляем на страницу регистрации/входа
-    if "user_id" not in session:
-        return redirect(url_for("register"))  # Если пользователь уже зарегистрирован, сразу перенаправляем на тест
-    return render_template("index.html")  # Перенаправляем на тест, если пользователь уже зарегистрирован
+    return render_template("index.html")
 
+# Регистрация пользователя
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    # Если user_id уже есть в сессии, очищаем сессию для принудительной авторизации
-    session.pop("user_id", None)
-
     if request.method == "POST":
-        name = request.form["name"]
-        email = request.form["email"]
+        username = request.form["username"]
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO users (username) VALUES (?)", (username,))
+            conn.commit()
+            session["user_id"] = cursor.lastrowid
+        return redirect(url_for("test"))
+    return render_template("register.html")
 
-        # Проверяем, существует ли пользователь с таким email
-        conn = sqlite3.connect("database.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
-        user = cursor.fetchone()
-
-        if user:
-            # Если пользователь найден в базе, сохраняем его id в сессии
-            session["user_id"] = user[0]
-            return redirect(url_for("test"))  # Перенаправляем на страницу теста
-        else:
-            # Если пользователь не найден, регистрируем нового
-            user_id = add_user(name, email)
-            session["user_id"] = user_id  # Сохраняем id нового пользователя в сессии
-            return redirect(url_for("test"))
-    return render_template("register.html") # Показываем страницу регистрации/входа
-
-
-@app.route("/test", methods=["GET", "POST"])
+# Страница с тестом
+@app.route("/test")
 def test():
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, question_text, correct_answer, option_1, option_2, option_3, option_4 FROM questions")
+        rows = cursor.fetchall()
+
+    questions = [
+        {
+            "id": row[0],
+            "question_text": row[1],
+            "correct_answer": row[2],
+            "options": [row[3], row[4], row[5], row[6]]
+        } for row in rows
+    ]
+
+    return render_template("test.html", questions=questions)
+
+# Обработка результатов теста
+@app.route("/submit", methods=["POST"])
+def submit():
     user_id = session.get("user_id")
     if not user_id:
         return redirect(url_for("register"))
 
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT payment_status FROM users WHERE id = ?", (user_id,))
-    result = cursor.fetchone()
-    conn.close()
+    answers = {key: value for key, value in request.form.items()}
+    test_date = request.form.get("test_date")
 
-    if not result:
-        return "Ошибка: Пользователь не найден!", 404
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO results (user_id, answers, test_date) VALUES (?, ?, ?)",
+            (user_id, json.dumps(answers), test_date)
+        )
+        conn.commit()
 
-    payment_status = result[0]
-    if payment_status == 0:
-        return redirect(url_for("payment"))
+    return redirect(url_for("result"))
 
-    if request.method == "POST":
-        answers = request.form["q1"]
-        save_result(user_id, answers)
-        return redirect(url_for("result"))
-
-    return render_template("test.html")
-
-@app.route("/payment")
-def payment():
-    user_id = session.get("user_id")
-    if not user_id:
-        return redirect(url_for("register"))
-    update_payment_status(user_id)
-    return redirect(url_for("test"))
-
+# Страница с результатами
 @app.route("/result")
 def result():
     user_id = session.get("user_id")
     if not user_id:
         return redirect(url_for("register"))
 
-    # Подключаемся к базе данных
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT answers, test_date FROM results WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
 
-    # Получаем ответы пользователя
-    cursor.execute("SELECT answers, test_date FROM results WHERE user_id = ?", (user_id,))
-    result = cursor.fetchone()
-    conn.close()
+        if not result:
+            return "Результаты теста не найдены!"
 
-    if not result:
-        return "Результаты теста не найдены!"  # Если нет результатов
+        user_answers, test_date = result
+        cursor.execute("SELECT id, question_text, correct_answer FROM questions")
+        questions = cursor.fetchall()
 
-    user_answers, test_date = result
+    question_data = {str(row[0]): {"text": row[1], "correct": row[2]} for row in questions}
 
-    # Пример правильных ответов (можно хранить их в базе или в отдельном файле)
-    correct_answers = {
-        "q1": "A",  # Вопрос 1: ответ "A"
-        "q2": "C",  # Вопрос 2: ответ "C"
-        "q3": "B",  # Вопрос 3: ответ "B"
-    }
-
-    # Разбираем ответы пользователя (если это строка формата JSON)
-    import json
     try:
-        user_answers = json.loads(user_answers)  # Например: {"q1": "A", "q2": "B", "q3": "B"}
+        user_answers = json.loads(user_answers)
     except json.JSONDecodeError:
         return "Ошибка в формате сохранённых ответов!"
 
-    # Сравниваем ответы и подсчитываем баллы
     score = 0
-    total_questions = len(correct_answers)
-    for question, correct_answer in correct_answers.items():
-        if user_answers.get(question) == correct_answer:
+    total_questions = len(question_data)
+    for question_id, data in question_data.items():
+        if user_answers.get(question_id) == data["correct"]:
             score += 1
 
-    # Передаем данные в шаблон
     return render_template(
         "result.html",
         score=score,
         total_questions=total_questions,
         test_date=test_date,
-        correct_answers=correct_answers,
+        correct_answers=question_data,
         user_answers=user_answers
     )
 
 if __name__ == "__main__":
+    init_db()
     app.run(debug=True)
 
 
