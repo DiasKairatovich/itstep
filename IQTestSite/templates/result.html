@@ -10,6 +10,7 @@
 <body>
     <h1>Your Results</h1>
     <p>You scored {{ score }} out of {{ total_questions }}.</p>
+
     <ul>
     {% for question in questions %}
     <li>
@@ -19,6 +20,7 @@
     </li>
     {% endfor %}
     </ul>
+
     <a href="/logout">Logout</a>
 </body>
 </html>
