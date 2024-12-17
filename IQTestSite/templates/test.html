@@ -1,3 +1,4 @@
+<!-- test.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,24 +8,15 @@
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <h1>Пройдите тест</h1>
-    <form action="{{ url_for('submit') }}" method="POST">
-        {% for question in questions %}
-            <div>
-                <h3>Вопрос {{ loop.index }}: {{ question.question_text }}</h3>
-                <ul>
-                    {% for option in question.options %}
-                        <li>
-                            <label>
-                                <input type="radio" name="q{{ question.id }}" value="{{ option }}" required>
-                                {{ option }}
-                            </label>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
+    <h1>IQ Test</h1>
+    <form method="POST">
+    {% for question in questions %}
+        <p>{{ question.question }}</p>
+        {% for option in question.options %}
+            <input type="radio" name="{{ question.id }}" value="{{ option }}" required> {{ option }}<br>
         {% endfor %}
-        <button type="submit">Отправить</button>
+    {% endfor %}
+    <button type="submit">Submit</button>
     </form>
 </body>
 </html>
