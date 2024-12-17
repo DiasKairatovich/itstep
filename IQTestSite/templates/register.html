@@ -1,4 +1,3 @@
-<!-- register.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,15 +9,44 @@
 <body>
     <h1>Register</h1>
     <form method="POST">
+        <!-- CSRF Protection Token -->
         {{ form.hidden_tag() }}
+
+        <!-- Name Field -->
         <label for="name">Name:</label>
-        {{ form.name }}<br>
+        {{ form.name(id="name") }}<br>
+
+        <!-- Email Field -->
         <label for="email">Email:</label>
-        {{ form.email }}<br>
-        <label for="password">Password:</label>
-        {{ form.password }}<br>
-        {{ form.submit }}
+        {{ form.email(id="email") }}<br>
+
+        <!-- Password Field with Show Password -->
+        <div>
+            {{ form.password.label }}<br>
+            {{ form.password(id="password") }}
+            <input type="checkbox" id="show_password" onclick="togglePassword()"> Show Password
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+            {{ form.submit }}
+        </div>
     </form>
-    <p>Already registered? <a href="/login">Login here</a>.</p>
+
+    <p>Already registered? <a href="{{ url_for('login') }}">Login here</a>.</p>
+
+    <!-- JavaScript to Toggle Password Visibility -->
+    <script>
+    function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const showPasswordCheckbox = document.getElementById("show_password");
+
+        if (showPasswordCheckbox.checked) {
+            passwordInput.type = "text";
+        } else {
+            passwordInput.type = "password";
+        }
+    }
+    </script>
 </body>
 </html>

@@ -67,10 +67,15 @@ def register():
         try:
             with sqlite3.connect("database.db") as conn:
                 cursor = conn.cursor()
+                # Insert new user into the database
                 cursor.execute("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", (name, email, password))
+                user_id = cursor.lastrowid
                 conn.commit()
-                flash("Registration successful! Please log in.", "success")
-                return redirect(url_for("login"))
+
+                # Log in the user immediately
+                session['user_id'] = user_id
+                flash("Registration successful! You are now logged in.", "success")
+                return redirect(url_for("test"))
         except sqlite3.IntegrityError:
             flash("Email already registered.", "danger")
     return render_template("register.html", form=form)
@@ -133,7 +138,9 @@ def result():
     cursor = conn.cursor()
 
     # Retrieve user answers
-    cursor.execute("SELECT answers, test_date FROM results WHERE user_id = ?", (user_id,))
+    cursor.execute("""
+        SELECT answers, test_date FROM results WHERE user_id = ? ORDER BY test_date DESC LIMIT 1 """, (user_id,))
+
     result = cursor.fetchone()
     conn.close()
 

@@ -9,13 +9,40 @@
 <body>
     <h1>Login</h1>
     <form method="POST">
+        <!-- CSRF Protection -->
         {{ form.hidden_tag() }}
+
+        <!-- Email Field -->
         <label for="email">Email:</label>
-        {{ form.email }}<br>
-        <label for="password">Password:</label>
-        {{ form.password }}<br>
-        {{ form.submit }}
+        {{ form.email(id="email") }}<br>
+
+        <!-- Password Field with Show Password -->
+        <div>
+            {{ form.password.label }}<br>
+            {{ form.password(id="login_password") }}
+            <input type="checkbox" id="show_login_password" onclick="toggleLoginPassword()"> Show Password
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+            {{ form.submit }}
+        </div>
     </form>
-    <p>Don't have an account? <a href="/register">Register here</a>.</p>
+
+    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a>.</p>
+
+    <!-- JavaScript for Password Visibility -->
+    <script>
+    function toggleLoginPassword() {
+        const passwordInput = document.getElementById("login_password");
+        const showPasswordCheckbox = document.getElementById("show_login_password");
+
+        if (showPasswordCheckbox.checked) {
+            passwordInput.type = "text";
+        } else {
+            passwordInput.type = "password";
+        }
+    }
+    </script>
 </body>
 </html>
