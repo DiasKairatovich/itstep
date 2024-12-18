@@ -7,29 +7,57 @@
     <title>Results</title>
 </head>
 <body>
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('index') }}">IQ Test</a>
         </div>
     </nav>
 
+    <!-- Results Section -->
     <div class="container mt-5">
         <h1 class="text-center">Your Results</h1>
-        <div class="alert alert-info text-center">
-            You scored {{ score }} out of {{ total_questions }}!
-        </div>
-        <h2 class="text-center">Details</h2>
-        <ul class="list-group mt-3">
-            {% for question in questions %}
-                <li class="list-group-item">
-                    <strong>{{ question['question'] }}</strong><br>
-                    Your answer: {{ user_answers[question['id']]|default("Not answered") }}<br>
-                    Correct answer: {{ question['answer'] }}
-                </li>
-            {% endfor %}
-        </ul>
 
-        <a href="{{ url_for('test') }}" class="btn btn-primary btn-lg mt-4">Retake Test</a>
+        <!-- Score Alert -->
+        {% if score is defined and total_questions is defined %}
+            <div class="alert alert-info text-center">
+                You scored <strong>{{ score }}</strong> out of <strong>{{ total_questions }}</strong>!
+            </div>
+        {% else %}
+            <div class="alert alert-danger text-center">
+                Error: Results could not be calculated. Please retake the test.
+            </div>
+        {% endif %}
+
+        <!-- Details Section -->
+        {% if questions and user_answers %}
+            <h2 class="text-center mt-4">Details</h2>
+            <ul class="list-group mt-3">
+                {% for question in questions %}
+                    <li class="list-group-item">
+                        <strong>Q{{ loop.index }}: {{ question['question'] }}</strong><br>
+
+                        <!-- User's Answer -->
+                        Your answer:
+                        <span class="{{ 'text-success' if user_answers[question['id']] == question['answer'] else 'text-danger' }}">
+                            {{ user_answers[question['id']|string]|default("Not answered") }}
+                        </span><br>
+
+                        <!-- Correct Answer -->
+                        Correct answer: <span class="text-success">{{ question['answer'] }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-warning text-center mt-4">
+                No questions or answers available to display. Please retake the test.
+            </div>
+        {% endif %}
+
+        <!-- Retake Button -->
+        <div class="text-center mt-4">
+            <a href="{{ url_for('test') }}" class="btn btn-primary btn-lg">Retake Test</a>
+        </div>
     </div>
 </body>
 </html>

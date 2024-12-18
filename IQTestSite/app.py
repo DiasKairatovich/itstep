@@ -106,17 +106,6 @@ def login():
                 flash("Invalid email or password.", "danger")
     return render_template("login.html", form=form)
 
-def save_result(user_id, answers):
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    # Convert answers dictionary to JSON
-    answers_json = json.dumps(answers)
-    cursor.execute("INSERT INTO results (user_id, answers) VALUES (?, ?)", (user_id, answers_json))
-    conn.commit()
-    conn.close()
-
-
-
 @app.route("/test", methods=["GET", "POST"])
 def test():
     # Ensure the user is logged in
@@ -125,10 +114,15 @@ def test():
         flash("Please log in to take the test.", "warning")
         return redirect(url_for("login"))
 
-    # Initialize or get the current question index
+    # Initialize session variables for the test
+    if 'current_question' not in session:
+        session['current_question'] = 0
+        session['answers'] = {}
+
+    # Get the current question index
     current_question_index = session.get('current_question', 0)
 
-    # Ensure the current question is within the bounds of the questions list
+    # If all questions are answered, redirect to results
     if current_question_index >= len(questions):
         return redirect(url_for("result"))
 
@@ -138,19 +132,9 @@ def test():
     if request.method == "POST":
         # Collect the user's answer for the current question
         answer = request.form.get(str(current_question["id"]))
-
-        # Save the answer in session (or a database as needed)
-        answers = session.get('answers', {})
-        answers[str(current_question["id"])] = answer
-        session['answers'] = answers
-
-        # Move to the next question
-        session['current_question'] = current_question_index + 1
-
-        # If there are no more questions, redirect to results
-        if current_question_index + 1 >= len(questions):
-            return redirect(url_for("result"))
-
+        if answer:
+            session['answers'][str(current_question["id"])] = answer
+            session['current_question'] += 1
         return redirect(url_for("test"))
 
     return render_template("test.html", question=current_question)
@@ -163,35 +147,38 @@ def result():
     if not user_id:
         return redirect(url_for("register"))
 
-    # Connect to the database
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
+    # Retrieve answers from the session
+    answers = session.get("answers", {})
+    if not answers:
+        flash("No answers found. Please retake the test.", "danger")
+        return redirect(url_for("test"))
 
-    # Retrieve user answers
-    cursor.execute("""
-        SELECT answers, test_date FROM results WHERE user_id = ? ORDER BY test_date DESC LIMIT 1 """, (user_id,))
+    # Save the answers to the database
+    save_result(user_id, answers)
 
-    result = cursor.fetchone()
-    conn.close()
+    # Clear answers and question index from the session
+    session.pop("answers", None)
+    session.pop("current_question", None)
 
-    if not result:
-        return "Test results not found!"
-
-    answers_json, test_date = result
-    user_answers = json.loads(answers_json)
-
-    # Score calculation
-    score = sum(1 for question in questions if user_answers.get(str(question["id"])) == question["answer"])
+    # Calculate the score
+    score = sum(1 for question in questions if answers.get(str(question["id"])) == question["answer"])
     total_questions = len(questions)
 
     return render_template(
         "result.html",
         score=score,
         total_questions=total_questions,
-        test_date=test_date,
         questions=questions,
-        user_answers=user_answers
+        user_answers=answers
     )
+
+def save_result(user_id, answers):
+    with sqlite3.connect("database.db") as conn:
+        cursor = conn.cursor()
+        # Convert answers dictionary to JSON
+        answers_json = json.dumps(answers)
+        cursor.execute("INSERT INTO results (user_id, answers) VALUES (?, ?)", (user_id, answers_json))
+        conn.commit()
 
 @app.route("/logout")
 def logout():
