@@ -35,10 +35,18 @@ def init_db():
 init_db()
 
 questions = [
-        {"id": 1, "question": "What is 2 + 2?", "options": ["3", "4", "5"], "answer": "4"},
-        {"id": 2, "question": "What is the capital of France?", "options": ["Berlin", "London", "Paris"], "answer": "Paris"},
-        {"id": 3, "question": "What is the square root of 9?", "options": ["2", "3", "4"], "answer": "3"},
-    ]
+    {"id": 1, "question": "What is 2 + 2?", "options": ["3", "4", "5"], "answer": "4"},
+    {"id": 2, "question": "What is the capital of France?", "options": ["Berlin", "London", "Paris"], "answer": "Paris"},
+    {"id": 3, "question": "What is the square root of 9?", "options": ["2", "3", "4"], "answer": "3"},
+    {"id": 4, "question": "What is the largest planet in our solar system?", "options": ["Earth", "Jupiter", "Saturn"], "answer": "Jupiter"},
+    {"id": 5, "question": "What is the chemical symbol for gold?", "options": ["Ag", "Au", "Pb"], "answer": "Au"},
+    {"id": 6, "question": "Which ocean is the largest?", "options": ["Atlantic Ocean", "Indian Ocean", "Pacific Ocean"], "answer": "Pacific Ocean"},
+    {"id": 7, "question": "Who wrote 'Romeo and Juliet'?", "options": ["William Shakespeare", "Charles Dickens", "Jane Austen"], "answer": "William Shakespeare"},
+    {"id": 8, "question": "What is the fastest land animal?", "options": ["Cheetah", "Lion", "Horse"], "answer": "Cheetah"},
+    {"id": 9, "question": "What is the currency of Japan?", "options": ["Yuan", "Yen", "Won"], "answer": "Yen"},
+    {"id": 10, "question": "What is the chemical formula for water?", "options": ["H2O", "CO2", "O2"], "answer": "H2O"}
+]
+
 
 # Forms
 class RegistrationForm(FlaskForm):
@@ -107,25 +115,47 @@ def save_result(user_id, answers):
     conn.commit()
     conn.close()
 
+
+
 @app.route("/test", methods=["GET", "POST"])
 def test():
+    # Ensure the user is logged in
     user_id = session.get("user_id")
     if 'user_id' not in session:
         flash("Please log in to take the test.", "warning")
         return redirect(url_for("login"))
 
-    if request.method == "POST":
-        # Collect user answers
-        answers = {}
-        for question in questions:
-            q_id = str(question["id"])
-            answers[q_id] = request.form.get(q_id)
+    # Initialize or get the current question index
+    current_question_index = session.get('current_question', 0)
 
-        # Save answers in the database
-        save_result(user_id, answers)
+    # Ensure the current question is within the bounds of the questions list
+    if current_question_index >= len(questions):
         return redirect(url_for("result"))
 
-    return render_template("test.html", questions=questions)
+    # Get the current question based on the index
+    current_question = questions[current_question_index]
+
+    if request.method == "POST":
+        # Collect the user's answer for the current question
+        answer = request.form.get(str(current_question["id"]))
+
+        # Save the answer in session (or a database as needed)
+        answers = session.get('answers', {})
+        answers[str(current_question["id"])] = answer
+        session['answers'] = answers
+
+        # Move to the next question
+        session['current_question'] = current_question_index + 1
+
+        # If there are no more questions, redirect to results
+        if current_question_index + 1 >= len(questions):
+            return redirect(url_for("result"))
+
+        return redirect(url_for("test"))
+
+    return render_template("test.html", question=current_question)
+
+
 
 @app.route("/result")
 def result():
