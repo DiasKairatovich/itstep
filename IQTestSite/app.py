@@ -130,14 +130,32 @@ def test():
     current_question = questions[current_question_index]
 
     if request.method == "POST":
-        # Collect the user's answer for the current question
-        answer = request.form.get(str(current_question["id"]))
-        if answer:
-            session['answers'][str(current_question["id"])] = answer
-            session['current_question'] += 1
+        # Handle "Next Question" button
+        if "next" in request.form:
+            # Collect the user's answer for the current question
+            answer = request.form.get(str(current_question["id"]))
+            if answer:
+                # Save the answer and move to the next question
+                session['answers'][str(current_question["id"])] = answer
+                session['current_question'] += 1
+
+        # Handle "Previous Question" button
+        elif "previous" in request.form:
+            if current_question_index > 0:
+                session['current_question'] -= 1
+
         return redirect(url_for("test"))
 
-    return render_template("test.html", question=current_question)
+    # Determine if Previous/Next buttons should be active
+    has_previous = current_question_index > 0
+    has_next = current_question_index < len(questions) - 1
+
+    return render_template(
+        "test.html",
+        question=current_question,
+        has_previous=has_previous,
+        has_next=has_next
+    )
 
 
 
