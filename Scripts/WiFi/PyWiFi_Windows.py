@@ -141,11 +141,10 @@ if __name__ == "__main__":
 
                 # List of passwords to try
                 password_list = [
-                    "password123",
-                    "letmein",
-                    "admin123",
-                    "qwerty123",
-                    "your_custom_password"
+                    "T@rget@iMain2019",
+                    "T@rget@iGuest2022",
+                    "aifc2018expo",
+                    "d:Quad6P)H"
                 ]
 
                 # Attempt to connect with passwords
