@@ -79,6 +79,20 @@ def main():
                         "aifc2018expo",
                         "d:Quad6P)H"
                     ]
+
+                    # password_list = [
+                    #     "12345678",
+                    #     "123456789",
+                    #     "qwerty123",
+                    #     "1234567890",
+                    #     "123456",
+                    #     "qwerty123456",
+                    #     "qazwsx",
+                    #     "asdfghjk",
+                    #     "password",
+                    #     "qwerty"
+                    # ]
+
                     for password in password_list:
                         print(f"Trying password: {password}")
                         connect_to_wifi(ssid, password)
