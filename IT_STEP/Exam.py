@@ -49,8 +49,8 @@ class Terminal:
 
     def display_menu(self):
         print("Меню:")
-        for i, pizza in enumerate(self.menu, 1):
-            print(f"{i}. {pizza.name} - {pizza.price} тенге")
+        for i in range(len(self.menu)):
+            print(f"{i + 1}. {self.menu[i].name} - {self.menu[i].price} тенге")
 
     def take_order(self):
         order = Order()
