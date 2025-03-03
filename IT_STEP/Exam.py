@@ -60,7 +60,7 @@ class Terminal:
 
             if choice == '0':
                 break
-            elif choice.isdigit() and 1 <= int(choice) <= len(self.menu):
+            elif 1 <= int(choice) <= len(self.menu):
                 order.add_pizza(self.menu[int(choice) - 1])
             else:
                 print("Неверный ввод. Попробуйте снова.")
