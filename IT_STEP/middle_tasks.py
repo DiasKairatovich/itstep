@@ -49,75 +49,75 @@
 # 9. ООП: Реализуйте класс BankAccount с методами deposit() и withdraw(),
 # которые изменяют баланс. Добавьте проверку, чтобы нельзя было
 # снять больше, чем есть на счете.
-# class BankAccount:
-#     def __init__(self, balance: int):
-#         self.balance = balance
-#
-#     def deposit(self, amount):
-#         if amount < 0:
-#             print("Нельзя добавить отрецатильное число на депозит")
-#         else:
-#             self.balance += amount
-#             print(self.balance)
-#
-#     def withdraw(self, amount):
-#         if self.balance > amount:
-#             self.balance -= amount
-#             print(self.balance)
-#         elif self.balance == amount:
-#             print("Нельзя оставить депозит пустым!")
-#         else:
-#             print("Сумма снятия превышает суммы на балансе !")
-#
-# user = BankAccount(1000)
-# # user.deposit(100)
-# user.withdraw(150)
+class BankAccount:
+    def __init__(self, balance: int):
+        self.balance = balance
+
+    def deposit(self, amount):
+        if amount < 0:
+            print("Нельзя добавить отрецатильное число на депозит")
+        else:
+            self.balance += amount
+            print(self.balance)
+
+    def withdraw(self, amount):
+        if self.balance > amount:
+            self.balance -= amount
+            print(self.balance)
+        elif self.balance == amount:
+            print("Нельзя оставить депозит пустым!")
+        else:
+            print("Сумма снятия превышает суммы на балансе !")
+
+user = BankAccount(1000)
+# user.deposit(100)
+user.withdraw(150)
 
 #-----------------------------------------------------------------------------------------------------------------------
 # 10.Многозадачность: Напишите программу, которая создает три потока.
 # Первый поток записывает числа от 1 до 10 в файл, второй поток
 # считывает их, третий — выводит сумму этих чисел.
 
-import threading
-
-filename = "test.txt"
-
-# Функция первого потока
-def write_numbers():
-    with open(filename, "w") as file:
-        for i in range(10):
-            file.write(str(i+1) + " ")
-            print(f"Записано число: {i+1}")
-    print(f"Числа записаны в файл {filename}")
-
-# Функция второго потока
-def read_numbers():
-    with open(filename, "r") as file:
-        numbers = []
-        for num in file.read().split():
-            numbers.append(int(num))
-    print(f"Числа считаны с файла {filename}:", numbers)
-    return numbers
-
-# Функция третьего потока
-def calculate_sum():
-    with open(filename, "r") as file:
-        numbers = []
-        for num in file.read().split():
-            numbers.append(int(num))
-    print("Сумма чисел:", sum(numbers))
-
-
-#Запуск каждого потока поэтапно
-thread1 = threading.Thread(target=write_numbers)
-thread1.start()
-thread1.join()
-
-thread2 = threading.Thread(target=read_numbers)
-thread2.start()
-thread2.join()
-
-thread3 = threading.Thread(target=calculate_sum)
-thread3.start()
-thread3.join()
-
+# import threading
+#
+# filename = "test.txt"
+#
+# # Функция первого потока
+# def write_numbers():
+#     with open(filename, "w") as file:
+#         for i in range(10):
+#             file.write(str(i+1) + " ")
+#             print(f"Записано число: {i+1}")
+#     print(f"Числа записаны в файл {filename}")
+#
+# # Функция второго потока
+# def read_numbers():
+#     with open(filename, "r") as file:
+#         numbers = []
+#         for num in file.read().split():
+#             numbers.append(int(num))
+#     print(f"Числа считаны с файла {filename}:", numbers)
+#     return numbers
+#
+# # Функция третьего потока
+# def calculate_sum():
+#     with open(filename, "r") as file:
+#         numbers = []
+#         for num in file.read().split():
+#             numbers.append(int(num))
+#     print("Сумма чисел:", sum(numbers))
+#
+#
+# #Запуск каждого потока поэтапно
+# thread1 = threading.Thread(target=write_numbers)
+# thread1.start()
+# thread1.join()
+#
+# thread2 = threading.Thread(target=read_numbers)
+# thread2.start()
+# thread2.join()
+#
+# thread3 = threading.Thread(target=calculate_sum)
+# thread3.start()
+# thread3.join()
+#
