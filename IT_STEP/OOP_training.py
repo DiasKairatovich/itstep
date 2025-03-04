@@ -1,70 +1,54 @@
-class Product:
-    def __init__(self, name, price):
+class Employee:
+    employee_count = 0
+    def __init__(self, name, position, salary):
         self.name = name
-        self.price = price
+        self.position = position
+        self.salary = salary
+        Employee.employee_count += 1
+
+    def give_raise(self, amount):
+        self.salary += amount
+
+    def total_employees(self):
+        print(f"Total employees: {Employee.employee_count}")
+
+    def __str__(self):
+        return f"Employee: {self.name}, Position: {self.position}, Salary: {self.salary}"
 
 
-class Basket:
-    def __init__(self):
-        self.products = []
 
-    def add_product(self, product):
-        if len(self.products) < 5:
-            self.products.append(product)
-            print(f"Added product {product.name} with price {product.price}")
-        else:
-            print(f"No more than 5 products in basket")
+class Manager(Employee):
+    def __init__(self, name, salary):
+        super().__init__(name, "Manager", salary)
 
-    def total_price(self):
-        total = 0
-        for product in self.products:
-            total += product.price
-        return total
+    def work(self):
+        print(f"Employee {self.name} manage with team and rule them")
 
-    def print_check(self):
-        print("\nYour check:")
-        for product in self.products:
-            print(f"Product: {product.name}, Price: {product.price}")
+class Developer(Employee):
+    def __init__(self, name, salary):
+        super().__init__(name, "Developer", salary)
+    def work(self):
+        print(f"Employee {self.name} works with developing code")
 
 
-class Terminal:
-    def __init__(self):
-        self.products = [
-            Product("Stuff1", 1200),
-            Product("Stuff2", 800),
-            Product("Stuff3", 700),
-            Product("Stuff4", 650),
-            Product("Stuff5", 1150),
-            Product("Stuff6", 450),
-            Product("Stuff7", 570),
-            Product("Stuff8", 840),
-            Product("Stuff9", 345),
-            Product("Stuff10", 980),
-        ]
+class Intern(Employee):
+    def __init__(self, name, salary=0):
+        super().__init__(name, "Intern", salary)
+    def work(self):
+        print(f"Intern {self.name} helps others and gain experience")
 
-    def display_menu(self):
-        print("Products to choose:")
-        for i in range(len(self.products)):
-            print(f"{i + 1}. {self.products[i].name} - {self.products[i].price}")
-
-    def take_order(self):
-        basket = Basket()
-        while True:
-            self.display_menu()
-            choice = input(f"Choose products you need (from 1 to 10, or 0 to exit): ")
-
-            if choice == "0":
-                break
-            elif choice.isdigit() and 1 <= int(choice) <= len(self.products):
-                basket.add_product(self.products[int(choice) - 1])
-            else:
-                print("Incorrect input type")
-
-        basket.print_check()
-        total_price = basket.total_price()
-        print(f"Total check price: {total_price}")
+########################################################################################################################
+manager = Manager("Алиса", 200000)
+developer = Developer("Боб", 150000)
+intern = Intern("Чарли")
 
 
-if __name__ == "__main__":
-    terminal = Terminal()
-    terminal.take_order()
+
+print(manager)  # Сотрудник: Алиса, Должность: Manager, Зарплата: 200000 тенге
+manager.work()  # Алиса управляет командой
+print("-"*50)
+print(developer)  # Сотрудник: Боб, Должность: Developer, Зарплата: 150000 тенге
+developer.work()  # Боб пишет код
+print("-"*50)
+print(intern)  # Сотрудник: Чарли, Должность: Intern, Зарплата: 0 тенге
+intern.work()  # Чарли проходит стажировку
