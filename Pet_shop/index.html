@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Shop</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Добро пожаловать в наш онлайн зоомагазин!</h1>
+        <select id="category-filter">
+            <option value="Все">Все категории</option>
+            <option value="Корм">Корм</option>
+            <option value="Игрушки">Игрушки</option>
+        </select>
+    </header>
+
+    <main>
+        <section id="products" class="product-list"></section>
+    </main>
+
+    <aside>
+        <h2>Корзина</h2>
+        <ul id="cart-items"></ul>
+        <p id="cart-total">Итого: 0₽</p>
+        <button id="clear-cart">Очистить корзину</button>
+    </aside>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
