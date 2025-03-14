@@ -1,69 +1,76 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #f8f8f8;
+    font-family: Arial, sans-serif; /* Устанавливаем шрифт Arial, если его нет — sans-serif */
+    margin: 0;  /* Убираем внешние отступы у body */
+    padding: 0; /* Убираем внутренние отступы у body */
+    display: flex; /* Делаем body flex-контейнером */
+    flex-direction: column; /* Размещаем дочерние элементы (header, main, aside) в столбик */
+    align-items: center; /* Выравниваем контент по центру */
+    background-color: #f8f8f8; /* Фон всей страницы — светло-серый */
 }
 
 header {
-    width: 100%;
-    background: #4CAF50;
-    color: white;
-    padding: 15px;
-    text-align: center;
-    font-size: 1.5em;
-    font-weight: bold;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Шапка занимает всю ширину экрана */
+    background: #4CAF50; /* Задаём зелёный фон */
+    color: white; /* Белый текст */
+    padding: 15px; /* Внутренний отступ 15px */
+    text-align: center; /* Выравниваем текст по центру */
+    font-size: 1.5em; /* Увеличиваем размер шрифта */
+    font-weight: bold; /* Делаем текст жирным */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Добавляем небольшую тень под шапкой */
 }
 
 #category-filter {
-    margin: 10px;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    margin: 10px; /* Внешний отступ вокруг фильтра */
+    padding: 8px; /* Внутренний отступ внутри элемента */
+    border-radius: 5px; /* Скругляем углы */
+    border: 1px solid #ccc; /* Серый контур */
+}
+
+#products {
+    display: flex;         /* Размещает товары в ряд */
+    flex-wrap: wrap;       /* Чтобы переносились на новую строку при нехватке места */
+    justify-content: center; /* Центрируем товары */
+    gap: 20px;             /* Отступы между товарами */
 }
 
 main {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 20px;
-    max-width: 1000px;
+    display: flex; /* Делаем flex-контейнер */
+    flex-wrap: wrap; /* Позволяем товарам переноситься на новую строку */
+    justify-content: center; /* Выравниваем товары по центру */
+    padding: 20px; /* Добавляем внутренний отступ */
+    max-width: 1000px; /* Ограничиваем ширину блока */
 }
 
 .product {
-    background: white;
-    margin: 15px;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    width: 220px;
-    transition: transform 0.3s ease-in-out;
+    background: white; /* Белый фон */
+    margin: 15px; /* Отступы между товарами */
+    padding: 15px; /* Внутренние отступы */
+    border-radius: 10px; /* Скругляем углы */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Лёгкая тень */
+    text-align: center; /* Выравниваем текст по центру */
+    width: 220px; /* Фиксированная ширина карточки */
+    transition: transform 0.3s ease-in-out; /* Анимация при наведении */
 }
 
 .product:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05); /* Увеличивает карточку на 5% при наведении */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Усиливает тень */
 }
 
 .product img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
+    max-width: 100%; /* Картинка не будет выходить за пределы блока */
+    height: auto; /* Сохраняем пропорции */
+    border-radius: 5px; /* Скругляем углы изображения */
 }
 
 .product button {
-    background: #ff9800;
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    width: 100%;
-    border-radius: 5px;
+    background: #ff9800; /* Оранжевый фон */
+    color: white; /* Белый текст */
+    border: none; /* Убираем рамку */
+    padding: 10px; /* Внутренний отступ */
+    cursor: pointer; /* Изменяем курсор при наведении */
+    width: 100%; /* Растягиваем кнопку на всю ширину карточки */
+    border-radius: 5px; /* Скругляем углы */
 }
 
 .product button:hover {
@@ -71,25 +78,27 @@ main {
 }
 
 aside {
-    position: fixed;
-    right: 20px;
-    top: 70px;
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: fixed; /* Фиксируем корзину на экране */
+    right: 20px; /* Размещаем её справа */
+    top: 70px; /* Отступ от верха */
+    background: white; /* Белый фон */
+    padding: 15px; /* Внутренний отступ */
+    border-radius: 8px; /* Скругляем углы */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Добавляем тень */
 }
 
 #clear-cart {
-    background: red;
-    padding: 10px;
-    border: none;
-    color: white;
-    width: 100%;
-    border-radius: 5px;
-    cursor: pointer;
+    background: red; /* Красный фон */
+    padding: 10px; /* Внутренний отступ */
+    border: none; /* Убираем рамку */
+    color: white; /* Белый текст */
+    width: 100%; /* Кнопка на всю ширину */
+    border-radius: 5px; /* Скругляем углы */
+    cursor: pointer; /* Изменяем курсор при наведении */
 }
+
 
 #clear-cart:hover {
     background: darkred;
 }
+
