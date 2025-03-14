@@ -13,8 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
         productContainer.innerHTML = ""; // Очистка перед рендером
 
         products.forEach(product => {
-            if (filter === "all" || product.category === filter) {
-
+            if (filter === "Все" || product.category === filter) {
                 const productElement = document.createElement("div");
                 productElement.classList.add("product");
                 productElement.innerHTML = `
@@ -24,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p>Цена: ${product.price} ₸.</p>
                     <button onclick="addToCart(${product.id})">Добавить в корзину</button>
                 `;
-                productContainer.appendChild(div);
+                productContainer.appendChild(productElement);
             }
         });
     }
@@ -57,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        document.getElementById("cart-total").textContent = `Итого: ${total}₽`;
+        document.getElementById("cart-total").textContent = `Итого: ${total}₸`;
     }
 
     function removeFromCart(id) {

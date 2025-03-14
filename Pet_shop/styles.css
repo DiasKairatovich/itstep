@@ -56,24 +56,38 @@ main {
     border-radius: 5px;
 }
 
-aside {
-    width: 300px;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    border-radius: 10px;
-}
-
-#clear-cart {
-    background: red;
+.product button {
+    background: #ff9800;
     color: white;
     border: none;
     padding: 10px;
     cursor: pointer;
-    margin-top: 10px;
+    width: 100%;
     border-radius: 5px;
-    transition: background 0.3s;
+}
+
+.product button:hover {
+    background: #e68900;
+}
+
+aside {
+    position: fixed;
+    right: 20px;
+    top: 70px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#clear-cart {
+    background: red;
+    padding: 10px;
+    border: none;
+    color: white;
+    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #clear-cart:hover {
