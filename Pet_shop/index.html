@@ -3,32 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pet Shop</title>
+    <title>Зоомагазин</title>
     <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
 </head>
 <body>
     <header>
-        <h1>Добро пожаловать в наш онлайн зоомагазин!</h1>
-        <select id="category-filter">
-            <option value="Все">Все категории</option>
-            <option value="Корм">Корм</option>
-            <option value="Игрушки">Игрушки</option>
-        </select>
+        <div class="logo">
+            <img src="images/logo.png" alt="Логотип зоомагазина">
+        </div>
+
+        <div class="address">
+            <p>Адрес: пр. Республики, 29</p>
+        </div>
+        <div class="work_time">
+            <p>Время работы: 9:00 - 21:00</p>
+        </div>
+        <div class="contacts">
+            <p>Тел: +7 777 371-50-72</p>
+        </div>
     </header>
-
     <main>
-        <section id="products" class="product-list"></section> <!-- запускается скрипт по аиди "products" -->
-    </main>
+        <div class="carousel">
+            <div class="carousel-container">
+                <div class="slide"><img src="images/sale1.png" alt="Скидка 1"></div>
+                <div class="slide"><img src="images/sale2.png" alt="Скидка 2"></div>
+                <div class="slide"><img src="images/sale3.png" alt="Скидка 3"></div>
+                <div class="slide"><img src="images/sale4.png" alt="Скидка 4"></div>
+                <div class="slide"><img src="images/sale5.png" alt="Скидка 5"></div>
+            </div>
+                <button class="prev" onclick="prevSlide()">&#10094;</button>
+                <button class="next" onclick="nextSlide()">&#10095;</button>
+        </div>
 
-    <aside>
+        <section class="products">
+            <div class="product" data-id="1" data-name="Корм для собак" data-price="500">
+                <img src="images/dog_food.png" alt="Корм для собак">
+                <h2>Корм для собак</h2>
+                <p>Цена: 3470 тг.</p>
+                <button class="add-to-cart">Добавить в корзину</button>
+            </div>
+            <div class="product" data-id="2" data-name="Корм для кошек" data-price="300">
+                <img src="/images/cat_food.png" alt="Корм для кошек">
+                <h2>Корм для кошек</h2>
+                <p>Цена: 2350 тг.</p>
+                <button class="add-to-cart">Добавить в корзину</button>
+            </div>
+            <div class="product" data-id="3" data-name="Игрушка для кошек" data-price="300">
+                <img src="/images/cat_toy.png" alt="Игрушка для кошек">
+                <h2>Игрушка для кошек</h2>
+                <p>Цена: 2350 тг.</p>
+                <button class="add-to-cart">Добавить в корзину</button>
+            </div>
+            <div class="product" data-id="4" data-name="Игрушка для собак" data-price="300">
+                <img src="/images/dog_toy.png" alt="Игрушка для собак">
+                <h2>Игрушка для кошек</h2>
+                <p>Цена: 2350 тг.</p>
+                <button class="add-to-cart">Добавить в корзину</button>
+            </div>
+            <div class="product" data-id="5" data-name="Текст" data-price="300">
+                <img src="/images/cat_food2.png" alt="Текст">
+                <h2>Игрушка для кошек</h2>
+                <p>Цена: 2350 тг.</p>
+                <button class="add-to-cart">Добавить в корзину</button>
+            </div>
+            <div class="product" data-id="6" data-name="Текст" data-price="300">
+                <img src="/images/cat_toy2.png" alt="Текст">
+                <h2>Игрушка для кошек</h2>
+                <p>Цена: 2350 тг.</p>
+                <button class="add-to-cart">Добавить в корзину</button>
+            </div>
+            <div class="product" data-id="7" data-name="Текст" data-price="300">
+                <img src="/images/dog_food2.png" alt="Текст">
+                <h2>Игрушка для кошек</h2>
+                <p>Цена: 2350 тг.</p>
+                <button class="add-to-cart">Добавить в корзину</button>
+            </div>
+            <div class="product" data-id="8" data-name="Текст" data-price="300">
+                <img src="/images/dog_toy2.png" alt="Текст">
+                <h2>Игрушка для кошек</h2>
+                <p>Цена: 2350 тг.</p>
+                <button class="add-to-cart">Добавить в корзину</button>
+            </div>
+        </section>
+    </main>
+    <aside class="cart">
         <h2>Корзина</h2>
         <ul id="cart-items"></ul>
-        <p id="cart-total">Итого: 0₽</p>
-        <button id="clear-cart">Очистить корзину</button>
+        <p>Итого: <span id="total-price">0</span> тг.</p>
     </aside>
-
-    <!--  Импорт скрипта  -->
-    <script src="script.js"></script>
 </body>
 </html>
-
