@@ -13,16 +13,19 @@
             <img src="images/logo.png" alt="Логотип зоомагазина">
         </div>
 
-        <div class="address">
-            <p>Адрес: пр. Республики, 29</p>
-        </div>
-        <div class="work_time">
-            <p>Время работы: 9:00 - 21:00</p>
-        </div>
-        <div class="contacts">
-            <p>Тел: +7 777 371-50-72</p>
+        <div class="header-info">
+            <div class="address">
+                <p>Адрес: пр. Республики, 29</p>
+            </div>
+            <div class="work_time">
+                <p>Время работы: 9:00 - 21:00</p>
+            </div>
+            <div class="contacts">
+                <p>Тел: +7 777 371-50-72</p>
+            </div>
         </div>
     </header>
+
     <main>
         <div class="carousel">
             <div class="carousel-container">
@@ -32,61 +35,75 @@
                 <div class="slide"><img src="images/sale4.png" alt="Скидка 4"></div>
                 <div class="slide"><img src="images/sale5.png" alt="Скидка 5"></div>
             </div>
-                <button class="prev" onclick="prevSlide()">&#10094;</button>
-                <button class="next" onclick="nextSlide()">&#10095;</button>
+            <button class="prev" onclick="prevSlide()">&#10094;</button>
+            <button class="next" onclick="nextSlide()">&#10095;</button>
+
+            <div class="carousel-indicators">
+                <span class="indicator active" onclick="goToSlide(0)"></span>
+                <span class="indicator" onclick="goToSlide(1)"></span>
+                <span class="indicator" onclick="goToSlide(2)"></span>
+                <span class="indicator" onclick="goToSlide(3)"></span>
+                <span class="indicator" onclick="goToSlide(4)"></span>
+            </div>
         </div>
 
+
         <section class="products">
-            <div class="product" data-id="1" data-name="Корм для собак" data-price="500">
+            <div class="product" data-id="1" data-name="Корм для собак" data-price="3470">
                 <img src="images/dog_food.png" alt="Корм для собак">
                 <h2>Корм для собак</h2>
                 <p>Цена: 3470 тг.</p>
                 <button class="add-to-cart">Добавить в корзину</button>
             </div>
-            <div class="product" data-id="2" data-name="Корм для кошек" data-price="300">
-                <img src="/images/cat_food.png" alt="Корм для кошек">
+            <div class="product" data-id="2" data-name="Корм для кошек" data-price="2350">
+                <img src="images/cat_food.png" alt="Корм для кошек">
                 <h2>Корм для кошек</h2>
                 <p>Цена: 2350 тг.</p>
                 <button class="add-to-cart">Добавить в корзину</button>
             </div>
-            <div class="product" data-id="3" data-name="Игрушка для кошек" data-price="300">
-                <img src="/images/cat_toy.png" alt="Игрушка для кошек">
+            <div class="product" data-id="3" data-name="Игрушка для кошек" data-price="2350">
+                <img src="images/cat_toy.png" alt="Игрушка для кошек">
                 <h2>Игрушка для кошек</h2>
                 <p>Цена: 2350 тг.</p>
                 <button class="add-to-cart">Добавить в корзину</button>
             </div>
-            <div class="product" data-id="4" data-name="Игрушка для собак" data-price="300">
-                <img src="/images/dog_toy.png" alt="Игрушка для собак">
-                <h2>Игрушка для кошек</h2>
+            <div class="product" data-id="4" data-name="Игрушка для собак" data-price="2350">
+                <img src="images/dog_toy.png" alt="Игрушка для собак">
+                <h2>Игрушка для собак</h2>
                 <p>Цена: 2350 тг.</p>
                 <button class="add-to-cart">Добавить в корзину</button>
             </div>
-            <div class="product" data-id="5" data-name="Текст" data-price="300">
-                <img src="/images/cat_food2.png" alt="Текст">
-                <h2>Игрушка для кошек</h2>
+            <div class="product" data-id="5" data-name="Корм для кошек 2" data-price="2350">
+                <img src="images/cat_food2.png" alt="Корм для кошек 2">
+                <h2>Корм для кошек 2</h2>
                 <p>Цена: 2350 тг.</p>
                 <button class="add-to-cart">Добавить в корзину</button>
             </div>
-            <div class="product" data-id="6" data-name="Текст" data-price="300">
-                <img src="/images/cat_toy2.png" alt="Текст">
-                <h2>Игрушка для кошек</h2>
+            <div class="product" data-id="6" data-name="Игрушка для кошек 2" data-price="2350">
+                <img src="images/cat_toy2.png" alt="Игрушка для кошек 2">
+                <h2>Игрушка для кошек 2</h2>
                 <p>Цена: 2350 тг.</p>
                 <button class="add-to-cart">Добавить в корзину</button>
             </div>
-            <div class="product" data-id="7" data-name="Текст" data-price="300">
-                <img src="/images/dog_food2.png" alt="Текст">
-                <h2>Игрушка для кошек</h2>
+            <div class="product" data-id="7" data-name="Корм для собак 2" data-price="2350">
+                <img src="images/dog_food2.png" alt="Корм для собак 2">
+                <h2>Корм для собак 2</h2>
                 <p>Цена: 2350 тг.</p>
                 <button class="add-to-cart">Добавить в корзину</button>
             </div>
-            <div class="product" data-id="8" data-name="Текст" data-price="300">
-                <img src="/images/dog_toy2.png" alt="Текст">
-                <h2>Игрушка для кошек</h2>
+            <div class="product" data-id="8" data-name="Игрушка для собак 2" data-price="2350">
+                <img src="images/dog_toy2.png" alt="Игрушка для собак 2">
+                <h2>Игрушка для собак 2</h2>
                 <p>Цена: 2350 тг.</p>
                 <button class="add-to-cart">Добавить в корзину</button>
             </div>
         </section>
     </main>
+
+    <footer>
+        <p>&copy; 2025 Зоомагазин. Все права защищены.</p>
+    </footer>
+
     <aside class="cart">
         <h2>Корзина</h2>
         <ul id="cart-items"></ul>

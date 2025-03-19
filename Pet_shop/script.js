@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const product = event.target.closest(".product");
             const id = product.dataset.id;
             const name = product.dataset.name;
-            const price = parseFloat(product.dataset.price); // Исправлено parseInt → parseFloat
+            const price = parseFloat(product.dataset.price);
 
             const existingItem = cart.find(item => item.id === id);
             if (existingItem) {
@@ -33,10 +33,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     //-------Карусель-------//
+    // ------- Карусель ------- //
     let currentIndex = 0;
     const container = document.querySelector(".carousel-container");
-    const totalSlides = document.querySelectorAll(".slide").length;
-    let autoScroll = setInterval(nextSlide, 4000); // Автопрокрутка
+    const slides = document.querySelectorAll(".slide");
+    const totalSlides = slides.length;
+    const indicatorsContainer = document.querySelector(".carousel-indicators");
+    let autoScroll = setInterval(nextSlide, 4000);
+
+    // Создаем индикаторы (точки)
+    slides.forEach((_, index) => {
+        const dot = document.createElement("span");
+        dot.classList.add("indicator");
+        if (index === 0) dot.classList.add("active");
+        dot.addEventListener("click", () => goToSlide(index));
+        indicatorsContainer.appendChild(dot);
+    });
+
+    function updateIndicators() {
+        document.querySelectorAll(".indicator").forEach((dot, index) => {
+            dot.classList.toggle("active", index === currentIndex);
+        });
+    }
 
     function showSlide(index) {
         if (index >= totalSlides) {
@@ -48,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         container.style.transform = `translateX(-${currentIndex * 100}%)`;
+        updateIndicators();
     }
 
     function nextSlide() {
@@ -56,6 +75,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function prevSlide() {
         showSlide(currentIndex - 1);
+    }
+
+    function goToSlide(index) {
+        showSlide(index);
+        resetAutoScroll();
     }
 
     function resetAutoScroll() {
@@ -73,4 +97,12 @@ document.addEventListener("DOMContentLoaded", () => {
         resetAutoScroll();
     });
 
+    // Остановка автопрокрутки при наведении
+    document.querySelector(".carousel").addEventListener("mouseenter", () => {
+        clearInterval(autoScroll);
+    });
+
+    document.querySelector(".carousel").addEventListener("mouseleave", () => {
+        resetAutoScroll();
+    });
 });
