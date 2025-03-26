@@ -26,3 +26,16 @@ class Reader(models.Model):
 
     def __str__(self):
         return f"{self.first_name}  {self.last_name}"
+
+
+class BorrowRecord(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    reader = models.ForeignKey(Reader, on_delete=models.CASCADE)
+    borrowed_at = models.DateTimeField(auto_now_add=True)
+    returned_at = models.DateTimeField(null=True, blank=True)
+
+    def is_returned(self):
+        return self.returned_at is not None
+
+    def __str__(self):
+        return f"{self.reader.name} - {self.book.title}"

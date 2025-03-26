@@ -2,16 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Главная</title>
+    <title>{% block title %}Главная{% endblock %}</title>
+    {% load django_bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
 </head>
 <body>
-    <h1>Cписок всех книг и их авторы</h1>
+    <h1>Список всех книг и их авторов</h1>
 
     <ul>
         {% for book in books %}
             <li>{{ book.title }} - {{ book.author.first_name }} {{ book.author.last_name }}</li>
         {% endfor %}
     </ul>
+
+    <h2>Сдать книгу</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-primary">Вернуть книгу</button>
+    </form>
 
 </body>
 </html>
