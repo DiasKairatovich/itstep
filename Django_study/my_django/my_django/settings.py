@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'library', # регестрируем приложение library
     "django_bootstrap5", # подключаем модуль bootstrap
+    'draft_app', # регестрируем приложение draft_app
 ]
 
 MIDDLEWARE = [
