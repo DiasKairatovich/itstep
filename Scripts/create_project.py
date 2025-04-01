@@ -45,7 +45,7 @@ def main():
     with open("requirements.txt", "w") as f:
         f.write(subprocess.run(["pip", "freeze"], capture_output=True, text=True).stdout)
 
-    print(f"✅ Проект {project_name} создан и настроен!")
+    print(f"Проект {project_name} создан и настроен!")
 
 if __name__ == "__main__":
     main()
