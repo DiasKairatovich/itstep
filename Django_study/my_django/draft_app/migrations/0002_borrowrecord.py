@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('library', '0001_initial'),
+        ('draft_app', '0001_initial'),
     ]
 
     operations = [
@@ -17,8 +17,8 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('borrowed_at', models.DateTimeField(auto_now_add=True)),
                 ('returned_at', models.DateTimeField(blank=True, null=True)),
-                ('book', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='library.book')),
-                ('reader', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='library.reader')),
+                ('book', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='draft_app.book')),
+                ('reader', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='draft_app.reader')),
             ],
         ),
     ]
