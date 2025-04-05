@@ -1,4 +1,48 @@
+from django.utils.text import slugify
+from django.core.validators import MinValueValidator
 from django.db import models
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(max_length=500)
+    price = models.FloatField(validators=[MinValueValidator(0.0)])
+    stock = models.IntegerField(validators=[MinValueValidator(0)])
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('new', 'Новый'),
+        ('processing', 'В обработке'),
+        ('delivered', 'Доставлен'),
+        ('canceled', 'Отменен'),
+    ]
+    id = models.AutoField(primary_key=True)
+    customer_name = models.CharField(max_length=100)
+    customer_email = models.EmailField(max_length=100)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+    total_price = models.FloatField(validators=[MinValueValidator(0.0)])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Заказ №{self.id} - {self.status}"
+
+class Article(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField(max_length=500)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
+    published_date = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
 
 # Таблица авторов в БД
 class Author(models.Model):
@@ -39,3 +83,4 @@ class BorrowRecord(models.Model):
 
     def __str__(self):
         return f"{self.reader.name} - {self.book.title}"
+
