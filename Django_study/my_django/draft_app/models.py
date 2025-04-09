@@ -2,6 +2,44 @@ from django.utils.text import slugify
 from django.core.validators import MinValueValidator
 from django.db import models
 
+class Human(models.Model):
+    first_name = models.CharField(max_length=100)
+    second_name = models.CharField(max_length=100)
+    age = models.IntegerField()
+
+    class Meta:
+        abstract = True
+
+class Child(Human):
+    hobby = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.first_name} {self.second_name}"
+
+class IceCream(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Kiosk(models.Model):
+    place = models.CharField(max_length=200)
+    ice_creams = models.ManyToManyField(IceCream)
+
+    def __str__(self):
+        return self.place
+
+
+
+
+
+
+
+
+
+
+
+
 class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=500)
@@ -83,4 +121,7 @@ class BorrowRecord(models.Model):
 
     def __str__(self):
         return f"{self.reader.name} - {self.book.title}"
+
+
+
 
