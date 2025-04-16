@@ -11,6 +11,7 @@ class Author(models.Model):
 # Таблица книг в БД
 class Book(models.Model):
     title = models.CharField(max_length=200)
+    new_field = models.CharField(max_length=200, default='default_value')
     author = models.ForeignKey(Author, on_delete=models.CASCADE) # Book теперь ссылается на Author через ForeignKey
     published_date = models.DateField()
     def __str__(self):
@@ -23,4 +24,3 @@ class Reader(models.Model):
     books = models.ManyToManyField(Book) # Reader теперь имеет связь ManyToManyField с Book
     def __str__(self):
         return f"{self.first_name}  {self.last_name}" # Отображение объекта в админке
-
