@@ -1,26 +1,45 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 
-# Таблица авторов в БД
 class Author(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     birth_date = models.DateField()
     def __str__(self):
-        return f"{self.first_name}  {self.last_name}"  # Отображение объекта в админке
+        return f"{self.first_name}  {self.last_name}"
+
+    def book_info(self): # Метод для получения количества книг, написанных автором
+        return self.books.count() # работает через related_name !!!
 
 # Таблица книг в БД
 class Book(models.Model):
     title = models.CharField(max_length=200)
-    new_field = models.CharField(max_length=200, default='default_value')
-    author = models.ForeignKey(Author, on_delete=models.CASCADE) # Book теперь ссылается на Author через ForeignKey
+    author = models.ForeignKey(Author, related_name='books', on_delete=models.CASCADE)
     published_date = models.DateField()
+    price = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        validators=[MinValueValidator(0.01)] # Не менее 0.01
+    )
     def __str__(self):
-        return self.title # Отображение объекта в админке
+        return self.title
+
+    def book_info(self):
+        return f"Book ID: {self.id} Title: {self.title} Price: {self.price}"
+
+    def reader_count(self): # Метод для получения количества читателей, которые прочитали эту книгу
+        return self.readers.count() # работает через related_name !!!
 
 # Таблица читателей в БД
 class Reader(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    books = models.ManyToManyField(Book) # Reader теперь имеет связь ManyToManyField с Book
+    books_read = models.ManyToManyField(Book, related_name='readers')
     def __str__(self):
-        return f"{self.first_name}  {self.last_name}" # Отображение объекта в админке
+        return f"{self.first_name}  {self.last_name}"
+
+    def books_read_count(self):
+        return self.books_read.count()
+
+    def books_info(self): # Метод для получения информации о прочитанных книгах
+        return [book.book_info() for book in self.books_read.all()] # работает через related_name !!!
