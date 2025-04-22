@@ -13,6 +13,19 @@ class Author(models.Model):
 
 # Таблица книг в БД
 class Book(models.Model):
+    CATEGORY_CHOICES = [
+        ('fiction', 'Fiction'),
+        ('nonfiction', 'Non-fiction'),
+        ('fantasy', 'Fantasy'),
+        ('sci-fi', 'Science Fiction'),
+        ('mystery', 'Mystery'),
+        ('biography', 'Biography'),
+        ('history', 'History'),
+        ('education', 'Education'),
+    ]
+
+    genre = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='fiction')
+
     title = models.CharField(max_length=200)
     author = models.ForeignKey(Author, related_name='books', on_delete=models.CASCADE)
     published_date = models.DateField()
