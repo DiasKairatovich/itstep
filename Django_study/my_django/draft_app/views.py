@@ -1,13 +1,14 @@
 from django.shortcuts import render
-
-def about_view(request):
-    return render(request, "draft_app/about.html")
+from .models import Book
 
 def home_view(request):
-    return render(request, "draft_app/home.html")
+    books = Book.objects.all() # получаем все объекты из БД по таблице Book
+    return render(request, "draft_app/home.html", {'books': books})
 
-def contacts_view(request):
-    return render(request, "draft_app/contacts.html")
+def static_page_view(request, page):
+    # оптимизация вьюшек для простого рендеринга статичных страниц Contacts и About
+    return render(request, f"draft_app/{page}.html")
+
 
 
 
