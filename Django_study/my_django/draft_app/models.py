@@ -60,12 +60,13 @@ class Book(models.Model):
 class Reader(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    books_read = models.ManyToManyField(Book, related_name='readers')
+
     def __str__(self):
         return f"{self.first_name}  {self.last_name}"
 
     def books_read_count(self):
-        return self.books_read.count()
+        return self.books_read.count() if self.books_read else 0
 
-    def books_info(self): # Метод для получения информации о прочитанных книгах
-        return [book.book_info() for book in self.books_read.all()] # работает через related_name !!!
+    def books_info(self):
+        return [book.book_info() for book in self.books_read.all()]  # можно оставить для использования в будущем
+
