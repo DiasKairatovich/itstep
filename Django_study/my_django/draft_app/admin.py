@@ -1,8 +1,7 @@
 from django.contrib import admin
-from .models import Author, Book, Reader
+from .models import Book
 
-admin.site.register(Author) # Регистрируем модель Author
 admin.site.register(Book) # Регистрируем модель Book
-admin.site.register(Reader) # Регистрируем модель Reader
+
 
 
