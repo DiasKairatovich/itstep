@@ -5,11 +5,12 @@ from .forms import TaskForm
 import csv
 
 def home(request):
-    return render(request, 'home.html')
+    return render(request, 'draft_app/home.html')
+
 
 def view_tasks(request):
     tasks = Task.objects.all()
-    return render(request, 'task_list.html', {'tasks': tasks})
+    return render(request, 'draft_app/task_list.html', {'tasks': tasks})
 
 def create_task(request):
     if request.method == 'POST':
@@ -19,11 +20,11 @@ def create_task(request):
             return redirect('task_list')
     else:
         form = TaskForm()
-    return render(request, 'task_form.html', {'form': form})
+    return render(request, 'draft_app/task_form.html', {'form': form})
 
 def view_task(request, id):
     task = get_object_or_404(Task, id=id)
-    return render(request, 'task_detail.html', {'task': task})
+    return render(request, 'draft_app/task_detail.html', {'task': task})
 
 def edit_task(request, id):
     task = get_object_or_404(Task, id=id)
@@ -34,7 +35,7 @@ def edit_task(request, id):
             return redirect('task_detail', id=id)
     else:
         form = TaskForm(instance=task)
-    return render(request, 'task_form.html', {'form': form})
+    return render(request, 'draft_app/task_form.html', {'form': form})
 
 def delete_task(request, id):
     task = get_object_or_404(Task, id=id)
@@ -60,7 +61,7 @@ def filter_by_status(request, status):
         tasks = Task.objects.filter(completed=False)
     else:
         tasks = []
-    return render(request, 'task_list.html', {'tasks': tasks})
+    return render(request, 'draft_app/task_list.html', {'tasks': tasks})
 
 def export_csv(request):
     tasks = Task.objects.all()
@@ -86,11 +87,11 @@ def import_csv(request):
                 completed=row['Выполнено'].lower() == 'true'
             )
         return redirect('task_list')
-    return render(request, 'import_form.html')
+    return render(request, 'draft_app/import_form.html')
 
 def search_tasks(request):
     query = request.GET.get('q')
     tasks = Task.objects.filter(title__icontains=query) if query else []
-    return render(request, 'task_list.html', {'tasks': tasks, 'query': query})
+    return render(request, 'draft_app/task_list.html', {'tasks': tasks, 'query': query})
 
 
