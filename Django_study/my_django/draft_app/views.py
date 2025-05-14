@@ -1,8 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 from .models import Task
 from .forms import TaskForm
-import csv
 
 def home(request):
     return render(request, 'draft_app/home.html')
