@@ -1,17 +1,7 @@
 {% extends 'draft_app/base.html' %}
 
-{% block title %}Главная{% endblock %}
-
 {% block content %}
-    <h1>Добро пожаловать на главную страницу!</h1>
-
-    <h2>Список всех данных</h2>
-    <ul>
-        {% for book in books %}
-            <li>{{ book.title }} - {{ book.author.first_name }}</li>
-        {% empty %}
-            <li>Нет данных в БД</li>
-        {% endfor %}
-    </ul>
-
+    <div class="notification is-primary">
+        Добро пожаловать в список задач!
+    </div>
 {% endblock %}

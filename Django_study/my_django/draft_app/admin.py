@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import Book
+from .models import Task
 
-admin.site.register(Book) # Регистрируем модель Book
+admin.site.register(Task) # Регистрируем модель Task
 
 
 
