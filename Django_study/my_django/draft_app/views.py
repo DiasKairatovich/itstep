@@ -63,32 +63,6 @@ def filter_by_status(request, status):
         tasks = []
     return render(request, 'draft_app/task_list.html', {'tasks': tasks})
 
-def export_csv(request):
-    tasks = Task.objects.all()
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="tasks.csv"'
-
-    writer = csv.writer(response)
-    writer.writerow(['ID', 'Название', 'Описание', 'Выполнено'])
-
-    for task in tasks:
-        writer.writerow([task.id, task.title, task.description, task.completed])
-
-    return response
-
-def import_csv(request):
-    if request.method == 'POST' and request.FILES.get('file'):
-        csv_file = request.FILES['file'].read().decode('utf-8').splitlines()
-        reader = csv.DictReader(csv_file)
-        for row in reader:
-            Task.objects.create(
-                title=row['Название'],
-                description=row.get('Описание', ''),
-                completed=row['Выполнено'].lower() == 'true'
-            )
-        return redirect('task_list')
-    return render(request, 'draft_app/import_form.html')
-
 def search_tasks(request):
     query = request.GET.get('q')
     tasks = Task.objects.filter(title__icontains=query) if query else []
