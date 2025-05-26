@@ -10,6 +10,8 @@ urlpatterns = [
     path('tasks/<int:id>/uncomplete/', views.uncomplete_task, name='task_uncomplete'),
     path('tasks/search/', views.search_tasks, name='task_search'),
 
+    path('tasks/list/', views.get_tasks, name='get_tasks'), ## для получения массива данных
+
     #### Маршруты с регулярными выражениями ###
     re_path(r'^tasks/(?P<id>\d+)/$', views.view_task, name='task_detail'),
     re_path(r'^tasks/(?P<id>\d+)/edit/$', views.edit_task, name='task_edit'),

@@ -1,6 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Task
 from .forms import TaskForm
+from django.http import JsonResponse
+from .models import Task
+
+def get_tasks(request):
+    tasks = [
+        {
+            'id': task.id,
+            'title': task.title,
+            'description': task.description,
+            'completed': task.completed
+        }
+        for task in Task.objects.all()
+    ]
+    return JsonResponse(tasks, safe=False)
 
 def home(request):
     return render(request, 'draft_app/home.html')
