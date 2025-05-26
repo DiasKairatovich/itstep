@@ -1,7 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import TaskForm
 from django.http import JsonResponse
+
 from .models import Task
+from django.views.generic import ListView, CreateView
+from django.urls import reverse_lazy
+
+class TaskListView(ListView):
+    model = Task
+    template_name = 'tasks/task_list.html'
+    context_object_name = 'tasks'
+
+class TaskCreateView(CreateView):
+    model = Task
+    fields = ['title', 'description', 'completed']
+    template_name = 'tasks/task_form.html'
+    success_url = reverse_lazy('task-list')
+
+def home(request):
+    return render(request, 'draft_app/home.html')
 
 def get_tasks(request):
     tasks = [
@@ -15,8 +32,6 @@ def get_tasks(request):
     ]
     return JsonResponse(tasks, safe=False)
 
-def home(request):
-    return render(request, 'draft_app/home.html')
 
 
 def view_tasks(request):
