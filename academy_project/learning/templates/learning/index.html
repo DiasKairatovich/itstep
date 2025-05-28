@@ -1,0 +1,18 @@
+{% extends 'learning/base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h2>Список курсов</h2>
+<ul class="list-group">
+  {% for item in course_data %}
+    <li class="list-group-item">
+        {{ item.course.title }} — студентов: {{ item.student_count }}
+        <a href="{% url 'course_detail' course_id=item.course.id %}">
+            <button>Подробнее</button>
+        </a>
+    </li>
+  {% empty %}
+    <li class="list-group-item">Курсов пока нет.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'learning/base.html' %}
+{% block title %}Course detail{% endblock %}
+
+{% block content %}
+<h1>{{ course.title }}</h1>
+<p><strong>Описание:</strong> {{ course.description }}</p>
+<p><strong>Дата начала:</strong> {{ course.start_date }}</p>
+<p><strong>Дата окончания:</strong> {{ course.end_date }}</p>
+
+<h2>Записанные студенты ({{ students|length }})</h2>
+{% if students %}
+    <ul>
+        {% for student in students %}
+            <li>{{ student.first_name }} {{ student.last_name }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>На этот курс ещё никто не записан.</p>
+{% endif %}
+
+<h2>Записать студента</h2>
+{% if error_message %}
+    <p style="color: red;">{{ error_message }}</p>
+{% endif %}
+<form method="post" action="{% url 'enroll_student' %}">
+    {% csrf_token %}
+    <label for="student">Студент:</label>
+    <select name="student_id" id="student">
+        {% for student in all_students %}
+            <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
+        {% endfor %}
+    </select>
+    <input type="hidden" name="course_id" value="{{ course.id }}">
+    <button type="submit">Записать</button>
+</form>
+
+<p><a href="{% url 'index' %}">На Главную</a></p>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% load django_bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Academy{% endblock %}</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<body>
+    <div class="container my-4">
+        <header class="mb-4">
+            <h1 class="text-center">Academy Project</h1>
+        </header>
+
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>
