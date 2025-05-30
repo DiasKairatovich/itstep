@@ -20,8 +20,7 @@ def create_data(name):
 def delete_data(id):
     cursor.execute(
         "DELETE FROM test_backup WHERE id = %s",
-        (id,)
-    )
+        (id,))
     conn.commit()
     print(f"Удалены данные по аиди: {id}")
 
