@@ -22,3 +22,4 @@ Watching for file changes with StatReloader
 Успешный вход: diasTest
 "POST / HTTP/1.1" 302 0
 "GET /home/ HTTP/1.1" 200 1196
+"GET / HTTP/1.1" 200 1176
