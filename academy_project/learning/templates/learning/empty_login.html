@@ -1,0 +1,10 @@
+{% extends 'learning/base.html' %}
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<body>
+    <h1>Ошибка</h1>
+    <p>Поле логина не должно быть пустым.</p>
+    <a href="{% url 'login' %}">Назад ко входу</a>
+</body>
+{% endblock %}

@@ -1,7 +1,29 @@
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Student, Course, Enrollment
+from .models import Student, Course, Enrollment, User
 from .forms import EnrollmentForm
+
+import logging # логирование импорт
+logger = logging.getLogger('learning') # логирование подключение
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        logger.info(f"Попытка входа: username={username}")
+
+        if not username:
+            return redirect('empty_login')
+
+        user = User.objects.get(username=username)
+        if user.check_password(password):
+            logger.info(f"Успешный вход: {username}") # логирование
+            return redirect('index')
+        else:
+            logger.warning(f"Неверный логин или пароль: {username}") # логирование
+            return render(request, 'learning/login.html', {'error': 'Неверный логин или пароль'})
+    return render(request, 'learning/login.html')
 
 def index(request):
     courses = Course.objects.all()

@@ -1,0 +1,24 @@
+Watching for file changes with StatReloader
+/home/dias/PycharmProjects/study/academy_project/learning/views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/dias/PycharmProjects/study/academy_project/learning/views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/dias/PycharmProjects/study/academy_project/learning/views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/dias/PycharmProjects/study/academy_project/learning/views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/dias/PycharmProjects/study/academy_project/learning/views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/dias/PycharmProjects/study/academy_project/learning/views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/dias/PycharmProjects/study/academy_project/learning/views.py changed, reloading.
+Watching for file changes with StatReloader
+/home/dias/PycharmProjects/study/academy_project/learning/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 1176
+Попытка входа: username=diasTest
+Успешный вход: diasTest
+"POST / HTTP/1.1" 302 0
+"GET /home/ HTTP/1.1" 200 1196
