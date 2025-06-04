@@ -1,25 +1,15 @@
-from django.urls import path, re_path
+from django.urls import path
 from . import views
 
-from .views import TaskListView, TaskCreateView
-
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('tasks/', TaskListView.as_view(), name='tasks'),
-    path('create/', TaskCreateView.as_view(), name='task_create'),
-
-    # path('tasks/', views.view_tasks, name='task_list'),
-    # path('tasks/create/', views.create_task, name='task_create'),
-    # path('tasks/<int:id>/delete/', views.delete_task, name='task_delete'),
-    # path('tasks/<int:id>/uncomplete/', views.uncomplete_task, name='task_uncomplete'),
-    # path('tasks/search/', views.search_tasks, name='task_search'),
-    #
-    # path('tasks/list/', views.get_tasks, name='get_tasks'), ## для получения массива данных
-    #
-    # #### Маршруты с регулярными выражениями ###
-    # re_path(r'^tasks/(?P<id>\d+)/$', views.view_task, name='task_detail'),
-    # re_path(r'^tasks/(?P<id>\d+)/edit/$', views.edit_task, name='task_edit'),
-    # re_path(r'^tasks/(?P<id>\d+)/complete/$', views.complete_task, name='task_complete'),
-    # re_path(r'^tasks/status/(?P<status>done|pending)/$', views.filter_by_status, name='task_filter_status'),
+    path('', views.view_tasks, name='task_list'),
+    path('task/create/', views.create_task, name='create_task'),
+    path('task/<int:id>/', views.view_task, name='task_detail'),
+    path('task/<int:id>/edit/', views.edit_task, name='edit_task'),
+    path('task/<int:id>/delete/', views.delete_task, name='delete_task'),
+    path('task/<int:id>/complete/', views.complete_task, name='complete_task'),
+    path('task/<int:id>/uncomplete/', views.uncomplete_task, name='uncomplete_task'),
+    path('tasks/status/<str:status>/', views.filter_by_status, name='filter_by_status'),
+    path('tasks/search/', views.search_tasks, name='search_tasks'),
 ]
 
