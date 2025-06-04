@@ -1,7 +1,7 @@
 {% extends 'draft_app/base.html' %}
 
 {% block content %}
-    <form method="get" action="{% url 'task_search' %}" class="mb-4">
+    <form method="get" action="{% url 'search_tasks' %}" class="mb-4">
         <div class="field has-addons">
             <div class="control">
                 <input class="input" type="text" name="q" placeholder="Поиск задач..." value="{{ query }}">
@@ -33,12 +33,12 @@
                         {% endif %}
                     </td>
                     <td>
-                        <a href="{% url 'task_edit' task.id %}">✏️</a>
-                        <a href="{% url 'task_delete' task.id %}">🗑️</a>
+                        <a href="{% url 'edit_task' task.id %}">✏️</a>
+                        <a href="{% url 'delete_task' task.id %}">🗑️</a>
                         {% if not task.completed %}
-                            <a href="{% url 'task_complete' task.id %}">✅</a>
+                            <a href="{% url 'complete_task' task.id %}">✅</a>
                         {% else %}
-                            <a href="{% url 'task_uncomplete' task.id %}">↩️</a>
+                            <a href="{% url 'uncomplete_task' task.id %}">↩️</a>
                         {% endif %}
                     </td>
                 </tr>

@@ -4,6 +4,6 @@
     <h2 class="title is-4">{{ task.title }}</h2>
     <p><strong>Описание:</strong> {{ task.description }}</p>
     <p><strong>Статус:</strong> {{ task.completed|yesno:"✅ Выполнено,⏳ В ожидании" }}</p>
-    <a class="button is-link" href="{% url 'task_edit' task.id %}">✏️ Редактировать</a>
-    <a class="button is-danger" href="{% url 'task_delete' task.id %}">🗑️ Удалить</a>
+    <a class="button is-link" href="{% url 'edit_task' task.id %}">✏️ Редактировать</a>
+    <a class="button is-danger" href="{% url 'delete_task' task.id %}">🗑️ Удалить</a>
 {% endblock %}

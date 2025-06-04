@@ -2,14 +2,15 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.view_tasks, name='task_list'),
-    path('task/create/', views.create_task, name='create_task'),
-    path('task/<int:id>/', views.view_task, name='task_detail'),
-    path('task/<int:id>/edit/', views.edit_task, name='edit_task'),
-    path('task/<int:id>/delete/', views.delete_task, name='delete_task'),
-    path('task/<int:id>/complete/', views.complete_task, name='complete_task'),
-    path('task/<int:id>/uncomplete/', views.uncomplete_task, name='uncomplete_task'),
-    path('tasks/status/<str:status>/', views.filter_by_status, name='filter_by_status'),
-    path('tasks/search/', views.search_tasks, name='search_tasks'),
+    path('', views.HomePageView.as_view(), name='home'), # СТАЛО CBV
+    path('tasks/', views.TaskListView.as_view(), name='task_list'), # СТАЛО CBV
+    path('task/create/', views.TaskCreateView.as_view(), name='create_task'), # СТАЛО CBV
+    path('task/<int:pk>/', views.TaskDetailView.as_view(), name='task_detail'), # СТАЛО CBV
+    path('task/<int:pk>/edit/', views.TaskUpdateView.as_view(), name='edit_task'), # СТАЛО CBV
+    path('task/<int:pk>/delete/', views.TaskDeleteView.as_view(), name='delete_task'), # СТАЛО CBV
+    path('tasks/status/<str:status>/', views.TaskStatusFilterView.as_view(), name='filter_by_status'), # СТАЛО CBV
+    path('task/<int:id>/complete/', views.TaskCompleleView.as_view(), name='complete_task'), # СТАЛО CBV
+    path('task/<int:id>/uncomplete/', views.TaskUncompleleView.as_view(), name='uncomplete_task'), # СТАЛО CBV
+    path('tasks/search/', views.TaskSearch.as_view(), name='search_tasks'), # СТАЛО CBV
 ]
 

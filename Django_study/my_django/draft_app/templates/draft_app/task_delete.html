@@ -1,0 +1,10 @@
+{% extends 'draft_app/base.html' %}
+
+{% block content %}
+  <h2>Вы действительно хотите удалить задачу "{{ object.title }}"?</h2>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Удалить</button>
+    <a href="{% url 'task_list' %}">Отмена</a>
+  </form>
+{% endblock %}
