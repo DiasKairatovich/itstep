@@ -1,0 +1,8 @@
+{% extends 'draft_app/base.html' %}
+
+{% block content %}
+    <h2 class="title is-4">First User</h2>
+    <p>ID: {{ object.id }}</p>
+    <p>Имя пользователя: {{ object.username }}</p>
+    <p>Email: {{ object.email }}</p>
+{% endblock %}

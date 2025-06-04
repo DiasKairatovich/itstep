@@ -12,5 +12,7 @@ urlpatterns = [
     path('task/<int:id>/complete/', views.TaskCompleleView.as_view(), name='complete_task'), # СТАЛО CBV
     path('task/<int:id>/uncomplete/', views.TaskUncompleleView.as_view(), name='uncomplete_task'), # СТАЛО CBV
     path('tasks/search/', views.TaskSearch.as_view(), name='search_tasks'), # СТАЛО CBV
+
+    path('first_user/', views.FirstUserView.as_view(), name='first_user'),
 ]
 

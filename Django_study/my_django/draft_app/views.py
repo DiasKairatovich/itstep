@@ -4,6 +4,16 @@ from .forms import TaskForm
 from .models import Task
 from django.urls import reverse_lazy
 
+from django.contrib.auth.models import User
+class FirstUserView(DetailView):
+    model = User
+    template_name = 'draft_app/first_user.html'
+
+    def get_object(self):
+        first_user = User.objects.order_by('id').second()
+        return first_user
+
+
 class HomePageView(TemplateView):
     template_name = 'draft_app/home.html'
 
