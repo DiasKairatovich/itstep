@@ -1,0 +1,10 @@
+<h1>Детали пользователя</h1>
+
+{% if user %}
+    <p>Имя: {{ user.username }}</p>
+    <p>Email: {{ user.email }}</p>
+{% else %}
+    <p>Пользователь не найден</p>
+{% endif %}
+
+<a href="{% url 'user_list' %}">Назад к списку</a>

@@ -1,29 +1,18 @@
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Student, Course, Enrollment, User
-from .forms import EnrollmentForm
+from .models import Student, Course, Enrollment
 
-import logging # логирование импорт
-logger = logging.getLogger('learning') # логирование подключение
+from .forms import EnrollmentForm, UserDataForm
+from django.views.generic.edit import FormView
+from django.views.generic.base import RedirectView
+from django.urls import reverse_lazy
 
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+class UserDataView(FormView):
+    template_name = 'learning/user_form.html'
+    form_class = UserDataForm
+    success_url = reverse_lazy('user_redirect')
 
-        logger.info(f"Попытка входа: username={username}")
 
-        if not username:
-            return redirect('empty_login')
-
-        user = User.objects.get(username=username)
-        if user.check_password(password):
-            logger.info(f"Успешный вход: {username}") # логирование
-            return redirect('index')
-        else:
-            logger.warning(f"Неверный логин или пароль: {username}") # логирование
-            return render(request, 'learning/login.html', {'error': 'Неверный логин или пароль'})
-    return render(request, 'learning/login.html')
 
 def index(request):
     courses = Course.objects.all()

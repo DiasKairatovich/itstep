@@ -1,0 +1,11 @@
+<h1>Главная страница</h1>
+
+<ul>
+    <li><a href="{% url 'user_list' %}">Посмотреть всех пользователей</a></li>
+    <li>
+        <form method="get" action="{% url 'user_detail' %}">
+            <input type="text" name="username" placeholder="Введите username">
+            <button type="submit">Найти пользователя</button>
+        </form>
+    </li>
+</ul>

@@ -41,11 +41,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'my_django.urls'
 
+STATIC_URL = 'static/'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [], # тут пусто оставляем
+        'APP_DIRS': True, # Для папки templates
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -100,8 +102,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
-STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
