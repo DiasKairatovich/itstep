@@ -47,3 +47,12 @@ def show_all_info():
     print("Текущие подписки:")
     for row in rows:
         print(f" - {row[0]} подписан на {row[1]}")
+
+if __name__ == "__main__":
+    # Тестирование
+    create_user("Python_user")
+    create_journal("Python Weekly")
+    subscribe(1, 1)
+    show_all_info()
+    unsubscribe(1, 1)
+    show_all_info()
