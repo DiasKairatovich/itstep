@@ -1,0 +1,10 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Поиск пользователя{% endblock %}
+
+{% block content %}
+    <form method="get" action="{% url 'users_list' %}">
+        <input type="text" name="search" placeholder="Введите username">
+        <button type="submit">Найти пользователя</button>
+    </form>
+{% endblock %}

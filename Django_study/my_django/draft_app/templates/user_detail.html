@@ -1,7 +1,0 @@
-<h1>Детали пользователя</h1>
-
-<p>Имя: {{ user.username }}</p>
-<p>Email: {{ user.email }}</p>
-<p>Зарегистрирован: {{ user.date_joined|date:"Y-m-d H:i" }}</p>
-
-<a href="{% url 'users_list' %}">Назад к списку</a>

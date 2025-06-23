@@ -6,11 +6,15 @@ from django.views.generic import ListView, DetailView
 
 class HomePageView(View):
     def get(self, request):
-        return render(request, 'home.html')
+        return render(request, 'draft_app/home.html')
+
+class UserSearchView(View):
+    def get(self, request):
+        return render(request, 'draft_app/user_search.html')
 
 class UserListView(ListView):
     model = User
-    template_name = 'users_list.html'
+    template_name = 'draft_app/users_list.html'
     context_object_name = 'users'
     ordering = ['-date_joined']  # для хронологического списка (от новых к старым)
 
@@ -26,7 +30,7 @@ class UserListView(ListView):
 
 class UserDetailView(DetailView):
     model = User
-    template_name = 'user_detail.html'
+    template_name = 'draft_app/user_detail.html'
     context_object_name = 'user'
     slug_field = 'username'
     slug_url_kwarg = 'username'

@@ -41,13 +41,13 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'my_django.urls'
 
-STATIC_URL = 'static/'
+STATIC_URL = 'static/' # Для статических файлов
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [], # тут пусто оставляем
-        'APP_DIRS': True, # Для папки templates
+        'DIRS': [BASE_DIR / 'templates'], # Для глобальной папки шаблонов
+        'APP_DIRS': True, # Для локальных папок templates
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
