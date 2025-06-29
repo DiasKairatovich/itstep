@@ -1,0 +1,18 @@
+<h1>Каталог книг</h1>
+
+{% with total=books|length %}
+  <p>Всего книг: {{ total }}</p>
+{% endwith %}
+
+<ul>
+  {% for book in books %}
+    <li>
+      <strong>{{ book.title }}</strong> — {{ book.author }}
+      {% if book.available %}
+        <span style="color: green;">(Доступна)</span>
+      {% else %}
+        <span style="color: red;">(Нет в наличии)</span>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
