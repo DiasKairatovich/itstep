@@ -1,9 +1,0 @@
-{% extends "layout/base.html" %}
-
-{% block title %}Детали пользователя{% endblock %}
-
-{% block content %}
-    <p>Имя: {{ user.username }}</p>
-    <p>Email: {{ user.email }}</p>
-    <p>Зарегистрирован: {{ user.date_joined|date:"Y-m-d H:i" }}</p>
-{% endblock %}
