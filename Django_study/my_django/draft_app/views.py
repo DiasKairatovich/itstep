@@ -29,16 +29,14 @@ def add_product_view(request):
     if request.method == 'POST':
         form = ProductForm(request.POST)
         if form.is_valid():
-            # Задание 8: save(commit=False)
             product = form.save(commit=False)
 
-            # Задание 6: Работа с cleaned_data
             print("Название:", form.cleaned_data['title'])
             print("Категории:", form.cleaned_data['categories'])
             print("Изменённые поля:", form.changed_data)
 
             product.save()
-            form.save_m2m()  # сохранение связей many-to-many
+            form.save_m2m()
             return redirect('success')
     else:
         form = ProductForm()
