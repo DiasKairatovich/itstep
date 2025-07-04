@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import Task
+from .models import Category, Product
 
-admin.site.register(Task) # Регистрируем модель Task
-
+admin.site.register(Category)
+admin.site.register(Product)
 
 

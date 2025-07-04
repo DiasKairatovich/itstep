@@ -1,8 +1,35 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}Главная страница{% endblock %}
+{% block title %}Главная{% endblock %}
 
-{% block main %}
-    <h1>Добро пожаловать на сайт!</h1>
+{% block content %}
+<h2>Список товаров</h2>
+<a href="{% url 'add_product' %}">Добавить товар</a>
 
+<ul>
+{% for product in page_obj %}
+    <li>
+        <strong>{{ product.title }}</strong> — {{ product.price }} ₸<br>
+        {{ product.description|truncatewords:10 }}<br>
+        {% if product.available %}<em>В наличии</em>{% else %}<em>Нет в наличии</em>{% endif %}<br>
+        <a href="{% url 'edit_product' product.pk %}">Редактировать</a>
+    </li>
+{% empty %}
+    <li>Нет товаров.</li>
+{% endfor %}
+</ul>
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1">« Первая</a>
+        <a href="?page={{ page_obj.previous_page_number }}">← Назад</a>
+    {% endif %}
+
+    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Вперёд →</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Последняя »</a>
+    {% endif %}
+</div>
 {% endblock %}

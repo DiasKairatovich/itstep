@@ -8,16 +8,17 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-
-    {% include 'navbar.html' %}
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Главная</a> |
+            <a href="{% url 'add_product' %}">Добавить товар</a>
+        </nav>
+        <hr>
+    </header>
 
     <main>
-        {% block main %}
-
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
-
-    {% include 'footer.html' %}
-
 </body>
 </html>
+
