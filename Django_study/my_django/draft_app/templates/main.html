@@ -3,33 +3,14 @@
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-<h2>Список товаров</h2>
-<a href="{% url 'add_product' %}">Добавить товар</a>
+    <div class="container mt-4">
+        <h1>Добавить книгу</h1>
 
-<ul>
-{% for product in page_obj %}
-    <li>
-        <strong>{{ product.title }}</strong> — {{ product.price }} ₸<br>
-        {{ product.description|truncatewords:10 }}<br>
-        {% if product.available %}<em>В наличии</em>{% else %}<em>Нет в наличии</em>{% endif %}<br>
-        <a href="{% url 'edit_product' product.pk %}">Редактировать</a>
-    </li>
-{% empty %}
-    <li>Нет товаров.</li>
-{% endfor %}
-</ul>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
 
-<div class="pagination">
-    {% if page_obj.has_previous %}
-        <a href="?page=1">« Первая</a>
-        <a href="?page={{ page_obj.previous_page_number }}">← Назад</a>
-    {% endif %}
-
-    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
-
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">Вперёд →</a>
-        <a href="?page={{ page_obj.paginator.num_pages }}">Последняя »</a>
-    {% endif %}
-</div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+    </div>
 {% endblock %}
