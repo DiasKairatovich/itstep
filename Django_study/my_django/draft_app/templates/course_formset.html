@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bulk Edit Courses</title>
+</head>
+<body>
+    <h1>Bulk Edit Courses</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        {% for form in formset %}
+            <fieldset style="margin-bottom: 10px;">
+                {{ form.as_p }}
+            </fieldset>
+        {% endfor %}
+
+        <button type="submit">Save All</button>
+    </form>
+
+    <p><a href="{% url 'course_list' %}">← Back to course list</a></p>
+</body>
+</html>

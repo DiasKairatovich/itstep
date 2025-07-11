@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Courses</title>
+</head>
+<body>
+    <h1>All Courses</h1>
+
+    <ul>
+        {% for course in courses %}
+            <li>
+                <a href="{% url 'course_detail' course.pk %}">{{ course.title }}</a>
+                — {{ course.price }}₸
+                | <a href="{% url 'course_edit' course.pk %}">Edit</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <p><a href="{% url 'course_add' %}">Add New Course</a></p>
+    <p><a href="{% url 'course_formset' %}">Bulk Edit Courses</a></p>
+</body>
+</html>

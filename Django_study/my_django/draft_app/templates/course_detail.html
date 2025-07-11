@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ course.title }}</title>
+</head>
+<body>
+    <h1>{{ course.title }}</h1>
+
+    <p><strong>Price:</strong> {{ course.price }}₸</p>
+    <p><strong>Description:</strong> {{ course.description }}</p>
+    <p><strong>Published:</strong> {{ course.published }}</p>
+
+    <h2>Lessons</h2>
+    {% if course.lessons.all %}
+        <ul>
+        {% for lesson in course.lessons.all %}
+            <li>{{ lesson.title }} — <a href="{{ lesson.video_link }}">Watch</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No lessons yet.</p>
+    {% endif %}
+
+    <p><a href="{% url 'course_edit' course.pk %}">Edit Course and Lessons</a></p>
+    <p><a href="{% url 'course_list' %}">← Back to course list</a></p>
+</body>
+</html>
