@@ -4,7 +4,18 @@ from .forms import CourseForm
 from django.forms import modelformset_factory, inlineformset_factory
 from django.utils import timezone
 from .models import Product
+from django.contrib.auth.decorators import login_required
 
+@login_required
+def user_info(request):
+    user = request.user
+    print(f"Пользователь: {user.username}")
+    print(f"Email: {user.email}")
+    print(f"Суперпользователь: {user.is_superuser}")
+    print(f"Состоит в группах: {[group.name for group in user.groups.all()]}")
+    print(f"Права: {[perm.codename for perm in user.user_permissions.all()]}")
+
+    return render(request, 'user_info.html', {'user': user})
 
 def manage_products(request):
     ProductFormSet = modelformset_factory(
