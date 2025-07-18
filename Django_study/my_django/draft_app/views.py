@@ -3,6 +3,33 @@ from .models import Course, Lesson
 from .forms import CourseForm
 from django.forms import modelformset_factory, inlineformset_factory
 from django.utils import timezone
+from .models import Product
+
+
+def manage_products(request):
+    ProductFormSet = modelformset_factory(
+        Product,
+        fields=('name', 'price'),
+        extra=2
+    )
+
+    if request.method == 'POST':
+        formset = ProductFormSet(request.POST)
+
+        if formset.is_valid():
+            # Обработка и сохранение всех форм в базе
+            formset.save()
+            return redirect('success')  # заменить на ваш URL
+        else:
+            # Если невалидна, форма будет с ошибками на шаблоне
+            pass
+    else:
+        formset = ProductFormSet(queryset=Product.objects.all())
+
+    return render(request, 'manage_products.html', {'formset': formset})
+
+def success(request):
+    return render(request, 'success.html')
 
 def course_list(request):
     courses = Course.objects.all()

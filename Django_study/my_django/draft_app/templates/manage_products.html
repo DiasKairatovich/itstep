@@ -1,0 +1,31 @@
+<!-- templates/products/manage_products.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Управление продуктами</title>
+</head>
+<body>
+    <h1>Управление продуктами</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        <table>
+            {% for form in formset %}
+                <tr>
+                    {% for field in form %}
+                        <td>
+                            {{ field.label_tag }}<br>
+                            {{ field }}<br>
+                            {{ field.errors }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+
+        <button type="submit">Сохранить</button>
+    </form>
+</body>
+</html>
