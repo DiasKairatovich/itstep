@@ -4,18 +4,29 @@ from .forms import CourseForm
 from django.forms import modelformset_factory, inlineformset_factory
 from django.utils import timezone
 from .models import Product
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+
 
 @login_required
-def user_info(request):
+def profile_view(request):
     user = request.user
-    print(f"Пользователь: {user.username}")
-    print(f"Email: {user.email}")
-    print(f"Суперпользователь: {user.is_superuser}")
-    print(f"Состоит в группах: {[group.name for group in user.groups.all()]}")
-    print(f"Права: {[perm.codename for perm in user.user_permissions.all()]}")
+    context = {
+        'user': user,
+        'is_superuser': user.is_superuser,
+        'groups': user.groups.all(),
+        'permissions': user.get_all_permissions(),
+    }
+    return render(request, 'profile.html', context)
 
-    return render(request, 'user_info.html', {'user': user})
+@login_required
+@permission_required('auth.change_user', raise_exception=True)
+def edit_profile_view(request):
+    return render(request, 'edit_profile.html')
+
+@login_required(login_url='/login/')
+@permission_required('auth.change_user', raise_exception=True)
+def secure_view(request):
+    return render(request, 'secure_page.html')
 
 def manage_products(request):
     ProductFormSet = modelformset_factory(

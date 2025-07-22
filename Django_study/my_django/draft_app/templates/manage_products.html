@@ -1,12 +1,10 @@
-<!-- templates/products/manage_products.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Управление продуктами</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Управление продуктами{% endblock %}
+
+{% block content %}
     <h1>Управление продуктами</h1>
+
     <form method="post">
         {% csrf_token %}
         {{ formset.management_form }}
@@ -27,5 +25,5 @@
 
         <button type="submit">Сохранить</button>
     </form>
-</body>
-</html>
+{% endblock %}
+

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Мой сайт{% endblock %}</title>
+</head>
+<body>
+
+<header>
+    <nav>
+        <ul>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'manage_products' %}">Главная</a></li>
+                <li><a href="{% url 'profile' %}">Кабинет</a></li>
+
+                {% if user.has_perm('auth.change_user') %}
+                    <li><a href="{% url 'edit_profile' %}">Редактировать профиль</a></li>
+                {% endif %}
+
+                <li><a href="{% url 'logout' %}">Выйти</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Войти</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+
+<hr>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>
