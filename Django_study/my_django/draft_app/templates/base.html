@@ -8,12 +8,12 @@
 
 <header>
     <nav>
-        <ul>
+        <ul style="list-style: none; display: flex; gap: 15px; padding: 0;">
             {% if user.is_authenticated %}
                 <li><a href="{% url 'manage_products' %}">Главная</a></li>
                 <li><a href="{% url 'profile' %}">Кабинет</a></li>
 
-                {% if user.has_perm('auth.change_user') %}
+                {% if perms.auth.change_user %}
                     <li><a href="{% url 'edit_profile' %}">Редактировать профиль</a></li>
                 {% endif %}
 

@@ -5,6 +5,8 @@ from django.forms import modelformset_factory, inlineformset_factory
 from django.utils import timezone
 from .models import Product
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 
 
 @login_required
@@ -23,32 +25,38 @@ def profile_view(request):
 def edit_profile_view(request):
     return render(request, 'edit_profile.html')
 
-@login_required(login_url='/login/')
+@login_required
 @permission_required('auth.change_user', raise_exception=True)
 def secure_view(request):
     return render(request, 'secure_page.html')
 
 def manage_products(request):
-    ProductFormSet = modelformset_factory(
-        Product,
-        fields=('name', 'price'),
-        extra=2
-    )
+    ProductFormSet = modelformset_factory(Product, fields=('name', 'price'), extra=2)
 
     if request.method == 'POST':
         formset = ProductFormSet(request.POST)
-
         if formset.is_valid():
-            # Обработка и сохранение всех форм в базе
             formset.save()
-            return redirect('success')  # заменить на ваш URL
-        else:
-            # Если невалидна, форма будет с ошибками на шаблоне
-            pass
+            return redirect('success')
     else:
         formset = ProductFormSet(queryset=Product.objects.all())
 
     return render(request, 'manage_products.html', {'formset': formset})
+
+def register_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # авто-вход
+            return redirect('profile')  # или 'manage_products'
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'register.html', {'form': form})
+
+
+
 
 def success(request):
     return render(request, 'success.html')

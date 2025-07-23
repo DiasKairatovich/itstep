@@ -1,32 +1,19 @@
 {% extends 'base.html' %}
-
 {% block title %}Профиль{% endblock %}
-
 {% block content %}
-    <h2>Профиль пользователя</h2>
-
-    <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Суперпользователь:</strong> {{ is_superuser|yesno:"Да,Нет" }}</p>
-
-    <p><strong>Группы:</strong>
-        {% if groups %}
-            {% for group in groups %}
-                {{ group.name }}{% if not forloop.last %}, {% endif %}
-            {% endfor %}
-        {% else %}
-            не состоит ни в одной
-        {% endif %}
-    </p>
-
-    <p><strong>Права:</strong></p>
-    {% if permissions %}
-        <ul>
-            {% for perm in permissions %}
-                <li>{{ perm }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Нет назначенных прав.</p>
-    {% endif %}
+<h2>Профиль пользователя</h2>
+<p>Имя: {{ user.username }}</p>
+<p>Email: {{ user.email }}</p>
+<p>Суперпользователь: {{ is_superuser|yesno:"Да,Нет" }}</p>
+<p>Группы:
+    {% for group in groups %}{{ group.name }}{% if not forloop.last %}, {% endif %}{% empty %}нет{% endfor %}
+</p>
+<p>Права:</p>
+<ul>
+    {% for perm in permissions %}
+        <li>{{ perm }}</li>
+    {% empty %}
+        <li>Нет назначенных прав</li>
+    {% endfor %}
+</ul>
 {% endblock %}
