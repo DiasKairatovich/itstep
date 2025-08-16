@@ -1,43 +1,41 @@
 from django.db import models
-from django.urls import reverse
-from datetime import timedelta
-from django.utils import timezone
 
-class Product(models.Model):
-    name = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=8, decimal_places=2)
-
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return self.name
-
-class Course(models.Model):
-    title = models.CharField(max_length=150)
-    price = models.DecimalField(max_digits=8, decimal_places=2)
-    published = models.DateTimeField()
-    category = models.ForeignKey(Category, related_name='courses', on_delete=models.CASCADE)
-    description = models.TextField(blank=True)
-
-    def __str__(self):
-        return self.title
-
-    def get_absolute_url(self):
-        return reverse('course_detail', args=[self.pk])
-
-    def is_recent(self):
-        return self.published >= timezone.now() - timedelta(days=7)
+# базовый абстрактный класс с полями времени
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'catalog_course'
-        ordering = ['-published']
+        abstract = True  # Эта модель не создаёт таблицу, только наследование
 
-class Lesson(models.Model):
-    title = models.CharField(max_length=100)
-    video_link = models.URLField()
-    course = models.ForeignKey(Course, related_name='lessons', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.title
+# ещё один абстрактный класс для адреса
+class AddressModel(models.Model):
+    city = models.CharField(max_length=100)
+    country = models.CharField(max_length=100)
+
+    class Meta:
+        abstract = True  # Эта модель не создаёт таблицу, только наследование
+
+# Последовательное наследование
+class Person(TimeStampedModel):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+# Последовательное наследование + расширение
+class Employee(Person):
+    employee_id = models.CharField(max_length=20)
+    position = models.CharField(max_length=100)
+
+    def get_employee_info(self):
+        return f"{self.full_name()} — {self.position} (ID: {self.employee_id})"
+
+# Двойное наследование: Manager наследует Employee и AddressModel
+class Manager(Employee, AddressModel):
+    department = models.CharField(max_length=100)
+
+    def get_manager_info(self):
+        return f"{self.get_employee_info()} — Руководитель отдела {self.department}, город {self.city}, страна {self.country}"
