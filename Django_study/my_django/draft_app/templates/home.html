@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+  <div class="text-center mb-5">
+    <h1 class="mb-3">Добро пожаловать в DraftApp</h1>
+    <p class="lead">
+      Загрузите изображение и получите миниатюру автоматически.
+    </p>
+    <a href="{% url 'upload_image' %}" class="btn btn-lg btn-primary mt-3">
+      Перейти к загрузке
+    </a>
+  </div>
+
+  {% if latest %}
+    <hr>
+    <h3 class="mb-4">Последние загруженные изображения</h3>
+    <div class="row">
+      {% for obj in latest %}
+        <div class="col-md-4 text-center mb-4">
+          <div class="card shadow-sm h-100">
+            <img src="{{ obj.thumbnail.url }}" class="card-img-top" alt="thumbnail">
+            <div class="card-body">
+              <p class="card-text text-muted">Загружено {{ obj.uploaded_at|date:"d.m.Y H:i" }}</p>
+              <a href="{{ obj.original.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                Оригинал
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

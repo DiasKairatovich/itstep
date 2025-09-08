@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'draft_app', # регестрируем приложение draft_app
     "django_bootstrap5", # подключаем модуль bootstrap
+    "sorl.thumbnail", # удобно для отображения в шаблонах
 ]
 
 MIDDLEWARE = [
@@ -95,6 +96,8 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

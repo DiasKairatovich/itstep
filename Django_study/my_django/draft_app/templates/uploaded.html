@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Результат{% endblock %}
+
+{% block content %}
+  <h2 class="mb-4">Файл успешно загружен</h2>
+
+  <div class="row">
+    <div class="col-md-6 text-center">
+      <h5>Оригинал</h5>
+      <img src="{{ obj.original.url }}" class="img-fluid rounded shadow-sm mb-3" alt="original">
+    </div>
+    <div class="col-md-6 text-center">
+      <h5>Миниатюра</h5>
+      <img src="{{ obj.thumbnail.url }}" class="img-fluid rounded shadow-sm mb-3" alt="thumbnail">
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <a href="{% url 'upload_image' %}" class="btn btn-success">Загрузить ещё</a>
+  </div>
+{% endblock %}

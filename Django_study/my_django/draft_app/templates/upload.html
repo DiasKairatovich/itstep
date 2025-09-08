@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Загрузка изображения{% endblock %}
+
+{% block content %}
+  <h2 class="mb-4">Загрузить изображение</h2>
+  <form method="post" enctype="multipart/form-data" class="needs-validation">
+    {% csrf_token %}
+    <div class="mb-3">
+      {{ form.image.label_tag }}
+      {{ form.image }}
+    </div>
+    <button type="submit" class="btn btn-primary">Загрузить</button>
+  </form>
+{% endblock %}

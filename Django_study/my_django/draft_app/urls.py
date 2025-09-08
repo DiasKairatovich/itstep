@@ -1,16 +1,15 @@
+from django.contrib import admin
 from django.urls import path
-from . import views
-from django.contrib.auth import views as auth_views
+from django.conf import settings
+from django.conf.urls.static import static
+from .views import upload_image, upload_success, home
 
 urlpatterns = [
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    path('register/', views.register_view, name='register'),  # если используешь
-
-    path('', views.manage_products, name='manage_products'),
-    path('success/', views.success, name='success'),
-
-    path('profile/', views.profile_view, name='profile'),
-    path('edit-profile/', views.edit_profile_view, name='edit_profile'),
-    path('secure-page/', views.secure_view, name='secure_page'),
+    path("admin/", admin.site.urls),
+    path("", home, name="home"),
+    path("upload/", upload_image, name="upload_image"),
+    path("success/<int:pk>/", upload_success, name="upload_success"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
