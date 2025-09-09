@@ -8,7 +8,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", home, name="home"),
     path("upload/", upload_image, name="upload_image"),
-    path("success/<int:pk>/", upload_success, name="upload_success"),
+    path("success/<str:token>/", upload_success, name="upload_success"),
 ]
 
 if settings.DEBUG:
