@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     'draft_app', # регестрируем приложение draft_app
     "django_bootstrap5", # подключаем модуль bootstrap
     "sorl.thumbnail", # удобно для отображения в шаблонах
+    "drf_app", # регестрируем приложение drf_app
+    "rest_framework",  # подключаем библиотеку DRF
 ]
 
 MIDDLEWARE = [
