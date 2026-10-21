@@ -1,1 +1,14 @@
-# Chatbot
+# Coffee Point
+
+Сайт-лендинг кофейни с местом для чат-бота.
+
+## Запуск
+
+**Python (без установки):**
+```bash
+python3 -m http.server 3456
+```
+Открыть → [http://localhost:3456](http://localhost:3456)
+
+**Live Server (VS Code):**  
+ПКМ на `index.html` → *Open with Live Server*

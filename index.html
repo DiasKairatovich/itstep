@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coffee Point — Твоя идеальная чашка кофе</title>
+  <meta name="description" content="Coffee Point — уютная кофейня с лучшим specialty-кофе, авторскими напитками и тёплой атмосферой. Загляни к нам или закажи через Telegram-бота!" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo" id="nav-logo">
+        <span class="logo-icon">☕</span>
+        <span class="logo-text">Coffee Point</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#about" class="nav-link">О нас</a></li>
+        <li><a href="#menu" class="nav-link">Меню</a></li>
+        <li><a href="#contacts" class="nav-link">Контакты</a></li>
+        <li>
+          <a href="https://t.me/your_bot" target="_blank" class="nav-tg-btn" id="nav-tg-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.088 14.02l-2.95-.924c-.642-.204-.657-.642.136-.953l11.57-4.461c.537-.194 1.006.131.718.566z"/></svg>
+            Telegram-бот
+          </a>
+        </li>
+      </ul>
+      <button class="burger" id="burger" aria-label="Меню">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <img src="hero.png" alt="Coffee Point interior" class="hero-img" />
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">Specialty Coffee</div>
+      <h1 class="hero-title">Coffee<br /><span class="hero-accent">Point</span></h1>
+      <p class="hero-subtitle">Место, где каждая чашка — это история.<br />Авторские напитки, уютная атмосфера и тёплая команда.</p>
+      <div class="hero-buttons">
+        <a href="#menu" class="btn btn-primary" id="btn-view-menu">Посмотреть меню</a>
+        <a href="#prices" class="btn btn-secondary" id="btn-view-prices">Узнать цены</a>
+        <a href="#contacts" class="btn btn-outline" id="btn-contacts">Контакты</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span>Прокрути вниз</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT ===== -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="section-tag">О нас</div>
+      <h2 class="section-title">Больше, чем просто кофейня</h2>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>Coffee Point — это место, где specialty-кофе встречается с тёплой атмосферой. Мы работаем только с зёрнами прямой обжарки от лучших фермеров Эфиопии, Колумбии и Бразилии.</p>
+          <p>Наши бариста — настоящие профессионалы, которые знают о кофе всё. Мы предлагаем не просто напиток, а целый опыт.</p>
+          <div class="about-stats">
+            <div class="stat">
+              <span class="stat-number">5+</span>
+              <span class="stat-label">лет опыта</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number">30+</span>
+              <span class="stat-label">позиций меню</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number">4.9★</span>
+              <span class="stat-label">рейтинг</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-image-wrap">
+          <img src="menu.png" alt="Кофейные напитки" class="about-img" />
+          <div class="about-badge">
+            <span>🏆</span>
+            <div>
+              <strong>Лучшая кофейня</strong>
+              <small>города 2024</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MENU ===== -->
+  <section class="menu-section" id="menu">
+    <div class="container">
+      <div class="section-tag">Меню</div>
+      <h2 class="section-title">Наши напитки</h2>
+      <p class="section-subtitle">Каждый напиток создан с заботой о вас</p>
+
+      <div class="menu-tabs" id="menu-tabs">
+        <button class="tab active" data-tab="hot" id="tab-hot">☕ Горячие</button>
+        <button class="tab" data-tab="cold" id="tab-cold">🧊 Холодные</button>
+        <button class="tab" data-tab="food" id="tab-food">🥐 Еда</button>
+      </div>
+
+      <div class="menu-grid" id="menu-grid">
+        <!-- Hot drinks -->
+        <div class="menu-card" data-category="hot">
+          <div class="menu-card-icon">☕</div>
+          <div class="menu-card-info">
+            <h3>Эспрессо</h3>
+            <p>Насыщенный односортный эспрессо из зёрен Эфиопии Yirgacheffe</p>
+          </div>
+          <span class="menu-price" id="price-espresso">250 ₸</span>
+        </div>
+        <div class="menu-card" data-category="hot">
+          <div class="menu-card-icon">🫶</div>
+          <div class="menu-card-info">
+            <h3>Капучино</h3>
+            <p>Идеальный баланс эспрессо и нежной воздушной молочной пены</p>
+          </div>
+          <span class="menu-price" id="price-cappuccino">650 ₸</span>
+        </div>
+        <div class="menu-card" data-category="hot">
+          <div class="menu-card-icon">🌿</div>
+          <div class="menu-card-info">
+            <h3>Флэт Уайт</h3>
+            <p>Двойной эспрессо с шёлковым микропенным молоком</p>
+          </div>
+          <span class="menu-price" id="price-flatwhite">750 ₸</span>
+        </div>
+        <div class="menu-card" data-category="hot">
+          <div class="menu-card-icon">🍫</div>
+          <div class="menu-card-info">
+            <h3>Мокко</h3>
+            <p>Эспрессо с натуральным бельгийским шоколадом и взбитым молоком</p>
+          </div>
+          <span class="menu-price" id="price-mocha">850 ₸</span>
+        </div>
+        <!-- Cold drinks -->
+        <div class="menu-card" data-category="cold" style="display:none">
+          <div class="menu-card-icon">🧊</div>
+          <div class="menu-card-info">
+            <h3>Колд Брю</h3>
+            <p>12-часовая холодная экстракция — мягкий и насыщенный вкус</p>
+          </div>
+          <span class="menu-price" id="price-coldbrew">900 ₸</span>
+        </div>
+        <div class="menu-card" data-category="cold" style="display:none">
+          <div class="menu-card-icon">🍦</div>
+          <div class="menu-card-info">
+            <h3>Айс Латте</h3>
+            <p>Эспрессо, лёд и охлаждённое молоко — идеально для жаркого дня</p>
+          </div>
+          <span class="menu-price" id="price-icelatte">750 ₸</span>
+        </div>
+        <div class="menu-card" data-category="cold" style="display:none">
+          <div class="menu-card-icon">🧋</div>
+          <div class="menu-card-info">
+            <h3>Матча Латте</h3>
+            <p>Японская матча с овсяным молоком на льду</p>
+          </div>
+          <span class="menu-price" id="price-matcha">950 ₸</span>
+        </div>
+        <div class="menu-card" data-category="cold" style="display:none">
+          <div class="menu-card-icon">🫐</div>
+          <div class="menu-card-info">
+            <h3>Фраппе с ягодами</h3>
+            <p>Смузи с черникой, кофе и молоком — освежает и бодрит</p>
+          </div>
+          <span class="menu-price" id="price-frappe">1050 ₸</span>
+        </div>
+        <!-- Food -->
+        <div class="menu-card" data-category="food" style="display:none">
+          <div class="menu-card-icon">🥐</div>
+          <div class="menu-card-info">
+            <h3>Круассан</h3>
+            <p>Свежая выпечка с хрустящей корочкой и нежным слоёным тестом</p>
+          </div>
+          <span class="menu-price" id="price-croissant">650 ₸</span>
+        </div>
+        <div class="menu-card" data-category="food" style="display:none">
+          <div class="menu-card-icon">🧁</div>
+          <div class="menu-card-info">
+            <h3>Маффин с черникой</h3>
+            <p>Домашний маффин с сочными ягодами и лимонной цедрой</p>
+          </div>
+          <span class="menu-price" id="price-muffin">550 ₸</span>
+        </div>
+        <div class="menu-card" data-category="food" style="display:none">
+          <div class="menu-card-icon">🍰</div>
+          <div class="menu-card-info">
+            <h3>Чизкейк</h3>
+            <p>Нью-йоркский чизкейк с малиновым соусом</p>
+          </div>
+          <span class="menu-price" id="price-cheesecake">1200 ₸</span>
+        </div>
+        <div class="menu-card" data-category="food" style="display:none">
+          <div class="menu-card-icon">🥪</div>
+          <div class="menu-card-info">
+            <h3>Сэндвич с авокадо</h3>
+            <p>Тост на ржаном хлебе с авокадо, рикоттой и микрозеленью</p>
+          </div>
+          <span class="menu-price" id="price-sandwich">1400 ₸</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICES ===== -->
+  <section class="prices-section" id="prices">
+    <div class="container">
+      <div class="section-tag">Цены</div>
+      <h2 class="section-title">Наши предложения</h2>
+      <p class="section-subtitle">Качество по справедливой цене</p>
+      <div class="prices-grid">
+        <div class="price-card" id="price-card-basic">
+          <div class="price-card-header">
+            <span class="price-plan-icon">☕</span>
+            <h3>Базовый</h3>
+          </div>
+          <div class="price-amount">от <strong>250 ₸</strong></div>
+          <ul class="price-features">
+            <li>✓ Эспрессо</li>
+            <li>✓ Американо</li>
+            <li>✓ Фильтр-кофе</li>
+          </ul>
+          <a href="#menu" class="btn btn-outline btn-sm">В меню</a>
+        </div>
+        <div class="price-card price-card-featured" id="price-card-popular">
+          <div class="price-card-popular-label">Популярное</div>
+          <div class="price-card-header">
+            <span class="price-plan-icon">🌟</span>
+            <h3>Авторское</h3>
+          </div>
+          <div class="price-amount">от <strong>750 ₸</strong></div>
+          <ul class="price-features">
+            <li>✓ Флэт Уайт</li>
+            <li>✓ Матча Латте</li>
+            <li>✓ Колд Брю</li>
+            <li>✓ Сезонные новинки</li>
+          </ul>
+          <a href="#menu" class="btn btn-primary btn-sm">В меню</a>
+        </div>
+        <div class="price-card" id="price-card-desserts">
+          <div class="price-card-header">
+            <span class="price-plan-icon">🍰</span>
+            <h3>Десерты</h3>
+          </div>
+          <div class="price-amount">от <strong>550 ₸</strong></div>
+          <ul class="price-features">
+            <li>✓ Выпечка</li>
+            <li>✓ Торты</li>
+            <li>✓ Сэндвичи</li>
+          </ul>
+          <a href="#menu" class="btn btn-outline btn-sm">В меню</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TELEGRAM BOT CTA ===== -->
+  <section class="tg-section" id="tg-section">
+    <div class="container">
+      <div class="tg-card">
+        <div class="tg-glow"></div>
+        <div class="tg-content">
+          <div class="tg-icon-wrap">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.088 14.02l-2.95-.924c-.642-.204-.657-.642.136-.953l11.57-4.461c.537-.194 1.006.131.718.566z"/></svg>
+          </div>
+          <div class="tg-text">
+            <h2>Наш Telegram-бот</h2>
+            <p>Узнайте меню, цены, акции и забронируйте столик прямо в Telegram. Работает 24/7!</p>
+          </div>
+          <a href="https://t.me/your_bot" target="_blank" class="btn btn-tg" id="btn-open-tg">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.088 14.02l-2.95-.924c-.642-.204-.657-.642.136-.953l11.57-4.461c.537-.194 1.006.131.718.566z"/></svg>
+            Открыть Telegram-бота
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CHAT WIDGET ===== -->
+  <section class="chat-section" id="chat-section">
+    <div class="container">
+      <div class="section-tag">Чат</div>
+      <h2 class="section-title">Онлайн-консультация</h2>
+      <p class="section-subtitle">Задайте вопрос нашему боту прямо здесь</p>
+      <div class="chat-widget-container" id="chat-widget-container">
+        <!-- Место для встроенного чат-виджета -->
+        <!-- Замените этот блок на embed-код вашего бота (Dialogflow, Botpress, etc.) -->
+        <div class="chat-widget-placeholder" id="chat-widget-placeholder">
+          <div class="chat-placeholder-icon">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 0 1-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>Чат-виджет будет здесь</h3>
+          <p>Вставьте embed-код вашего чат-бота<br />(Dialogflow CX, Botpress, Tidio, и др.) в файл <code>index.html</code><br />внутрь блока <code>#chat-widget-container</code></p>
+          <div class="chat-placeholder-tags">
+            <span>Dialogflow</span>
+            <span>Botpress</span>
+            <span>Tidio</span>
+            <span>Kommunicate</span>
+          </div>
+        </div>
+        <!-- ПРИМЕР: если используете Dialogflow, вставьте сюда тег df-messenger -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACTS ===== -->
+  <section class="contacts-section" id="contacts">
+    <div class="container">
+      <div class="section-tag">Контакты</div>
+      <h2 class="section-title">Как нас найти</h2>
+      <div class="contacts-grid">
+        <div class="contact-card" id="contact-address">
+          <div class="contact-icon">📍</div>
+          <h3>Адрес</h3>
+          <p>г. Алматы, ул. Достык, 123<br />2 этаж, ТЦ «Центр»</p>
+        </div>
+        <div class="contact-card" id="contact-hours">
+          <div class="contact-icon">🕐</div>
+          <h3>Часы работы</h3>
+          <p>Пн–Пт: 08:00 – 22:00<br />Сб–Вс: 09:00 – 23:00</p>
+        </div>
+        <div class="contact-card" id="contact-phone">
+          <div class="contact-icon">📞</div>
+          <h3>Телефон</h3>
+          <p><a href="tel:+77001234567">+7 700 123-45-67</a></p>
+        </div>
+        <div class="contact-card" id="contact-social">
+          <div class="contact-icon">💬</div>
+          <h3>Мы в соцсетях</h3>
+          <div class="social-links">
+            <a href="https://t.me/your_channel" target="_blank" class="social-link" id="social-tg">Telegram</a>
+            <a href="https://instagram.com/coffeepoint" target="_blank" class="social-link" id="social-ig">Instagram</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <a href="#" class="nav-logo footer-logo">
+          <span class="logo-icon">☕</span>
+          <span class="logo-text">Coffee Point</span>
+        </a>
+        <p class="footer-copy">© 2024 Coffee Point. Все права защищены.</p>
+        <div class="footer-links">
+          <a href="#menu">Меню</a>
+          <a href="#contacts">Контакты</a>
+          <a href="https://t.me/your_bot" target="_blank">Telegram-бот</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== FLOATING TG BUTTON ===== -->
+  <a href="https://t.me/your_bot" target="_blank" class="fab-tg" id="fab-tg" aria-label="Открыть Telegram-бота">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.088 14.02l-2.95-.924c-.642-.204-.657-.642.136-.953l11.57-4.461c.537-.194 1.006.131.718.566z"/></svg>
+    <span class="fab-tooltip">Telegram-бот</span>
+  </a>
+
+  <script src="script.js"></script>
+</body>
+</html>
