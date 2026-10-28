@@ -54,7 +54,7 @@ tabs.forEach(tab => {
 // === SCROLL REVEAL ===
 const revealElements = document.querySelectorAll(
   '.about-grid, .menu-grid, .prices-grid, .contacts-grid, ' +
-  '.tg-card, .chat-widget-container, .section-title, .section-tag, .section-subtitle'
+  '.chat-widget-container, .section-title, .section-tag, .section-subtitle'
 );
 
 revealElements.forEach(el => el.classList.add('reveal'));
@@ -84,20 +84,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
-// === FAB: hide when footer visible ===
-const fab = document.getElementById('fab-tg');
-const footer = document.getElementById('footer');
-
-const footerObserver = new IntersectionObserver(
-  ([entry]) => {
-    fab.style.opacity = entry.isIntersecting ? '0' : '1';
-    fab.style.pointerEvents = entry.isIntersecting ? 'none' : 'auto';
-  },
-  { threshold: 0.3 }
-);
-
-footerObserver.observe(footer);
-
 // === MENU CARDS: hover ripple ===
 document.querySelectorAll('.menu-card').forEach(card => {
   card.addEventListener('mousemove', (e) => {
@@ -109,4 +95,4 @@ document.querySelectorAll('.menu-card').forEach(card => {
   });
 });
 
-console.log('☕ Coffee Point — сайт загружен. Добавьте ссылки на Telegram-бота и чат-виджет!');
+console.log('☕ Coffee Point — сайт загружен.');

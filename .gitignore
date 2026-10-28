@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+.npm-cache/
+
+# Секреты — никогда не коммитим
+.env
+.env.local
+
+# Логи
+npm-debug.log*
+*.log

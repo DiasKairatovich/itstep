@@ -1,0 +1,29 @@
+{
+  "name": "coffee-point",
+  "version": "1.0.0",
+  "description": "Coffee Point — лендинг кофейни с серверной частью и ИИ-чат-ботом",
+  "private": true,
+  "type": "commonjs",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DiasKairatovich/itstep.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DiasKairatovich/itstep/issues"
+  },
+  "homepage": "https://github.com/DiasKairatovich/itstep#readme",
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^4.22.3",
+    "openai": "^4.104.0"
+  }
+}
