@@ -5,7 +5,8 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const OpenAI = require('openai');
-const { buildSystemPrompt } = require('./context');
+const auth = require('./users');
+const knowledge = require('./knowledge');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
@@ -13,6 +14,7 @@ const PORT = Number(process.env.PORT) || 3456;
 const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 const MAX_MESSAGES = Number(process.env.MAX_MESSAGES) || 20;
 const MAX_INPUT_CHARS = 2000;
+const SESSION_COOKIE = 'cp_session';
 
 /** Ответ, когда вопрос вне темы кофейни, либо OpenAI недоступен. */
 const DEFAULT_ANSWER =
@@ -101,7 +103,7 @@ async function askOpenAI(messages) {
     model: MODEL,
     temperature: 0.3,
     max_tokens: 400,
-    messages: [{ role: 'system', content: buildSystemPrompt() }, ...messages],
+    messages: [{ role: 'system', content: knowledge.buildSystemPrompt() }, ...messages],
   });
 
   const text = res.choices?.[0]?.message?.content?.trim();
@@ -109,6 +111,92 @@ async function askOpenAI(messages) {
   if (text.includes(OUT_OF_SCOPE)) return DEFAULT_ANSWER;
   return text;
 }
+
+/* ------------------------------------------------------------------ *
+ *  Аутентификация
+ * ------------------------------------------------------------------ */
+
+const COOKIE_OPTS = {
+  httpOnly: true,
+  sameSite: 'lax',
+  path: '/',
+  maxAge: 30 * 24 * 60 * 60 * 1000,
+};
+
+function readSessionToken(req) {
+  const match = (req.headers.cookie || '').match(/(?:^|;\s*)cp_session=([^;\s]+)/);
+  return match ? match[1] : null;
+}
+
+function currentUser(req) {
+  const token = readSessionToken(req);
+  return token ? auth.resolveSession(token) : null;
+}
+
+function requireUser(req, res, next) {
+  const user = currentUser(req);
+  if (!user) return res.status(401).json({ error: 'unauthorized', message: 'Нужно войти в кабинет.' });
+  req.user = user;
+  next();
+}
+
+function requireAdmin(req, res, next) {
+  const user = currentUser(req);
+  if (!user) return res.status(401).json({ error: 'unauthorized', message: 'Нужно войти в кабинет.' });
+  if (user.role !== 'admin') return res.status(403).json({ error: 'forbidden', message: 'Только для администратора.' });
+  next();
+}
+
+function loginVia(req, res, user) {
+  const token = auth.createSession(user);
+  res.cookie(SESSION_COOKIE, token, COOKIE_OPTS);
+  res.json({ user });
+}
+
+app.post('/api/auth/login', rateLimit, (req, res) => {
+  const { login, password } = req.body || {};
+  const errs = auth.validate(login, password);
+  if (errs.length) return res.status(400).json({ error: 'bad_request', message: errs.join('. ') });
+
+  const user = auth.verify(login, password);
+  if (!user) return res.status(401).json({ error: 'unauthorized', message: 'Неверный логин или пароль.' });
+
+  loginVia(req, res, user);
+});
+
+app.post('/api/auth/register', rateLimit, (req, res) => {
+  const { login, password } = req.body || {};
+  const errs = auth.validate(login, password);
+  if (errs.length) return res.status(400).json({ error: 'bad_request', message: errs.join('. ') });
+
+  const result = auth.register(login, password);
+  if (result.error) return res.status(409).json({ error: 'conflict', message: result.error });
+
+  loginVia(req, res, result.user);
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  const token = readSessionToken(req);
+  if (token) auth.destroySession(token);
+  res.clearCookie(SESSION_COOKIE, { path: '/' });
+  res.json({ ok: true });
+});
+
+app.get('/api/auth/me', (req, res) => {
+  res.json({ user: currentUser(req) });
+});
+
+/* ------------------------------------------------------------------ *
+ *  База знаний (только администратор)
+ * ------------------------------------------------------------------ */
+app.get('/api/knowledge', requireAdmin, (_req, res) => {
+  res.json({ sections: knowledge.load(), bytes: knowledge.sizeBytes() });
+});
+
+app.put('/api/knowledge', requireAdmin, (req, res) => {
+  const sections = knowledge.save(req.body?.sections);
+  res.json({ sections, bytes: knowledge.sizeBytes() });
+});
 
 /* ------------------------------------------------------------------ *
  *  Маршруты
@@ -150,14 +238,20 @@ app.use(
   })
 );
 
+// Кабинет — чистый URL вместо account.html.
+app.get('/account', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'account.html')));
+
 // Фолбэк для несуществующих путей — на index, как у SPA-подобных лендингов.
-app.get(/^(?!\/api\/).*/, (_req, res) => res.redirect('/'));
+app.get(/^(?!\/api\/|\/account).*/, (_req, res) => res.redirect('/'));
 
 module.exports = { app, normalizeMessages, DEFAULT_ANSWER };
 
 // Слушатель поднимаем только при прямом запуске — чтобы модуль можно было
 // импортировать в тестах, не занимая порт.
 if (require.main === module) {
+  auth.ensureAdmin();
+  auth.startSessionCleanup();
+
   const server = app.listen(PORT, () => {
     console.log(`☕ Coffee Point → http://localhost:${PORT}`);
   });

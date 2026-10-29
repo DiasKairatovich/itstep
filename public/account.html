@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Личный кабинет — Coffee Point</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="account-page">
+
+  <nav class="navbar scrolled">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-icon">☕</span>
+        <span class="logo-text">Coffee Point</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">На сайт</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===== ЭКРАН ВХОДА ===== -->
+  <section class="acc-screen" id="screen-auth" hidden>
+    <div class="acc-card">
+      <div class="acc-tabs" role="tablist">
+        <button class="acc-tab active" id="tab-login" type="button">Вход</button>
+        <button class="acc-tab" id="tab-register" type="button">Регистрация</button>
+      </div>
+
+      <form class="acc-form" id="auth-form" novalidate>
+        <label>
+          Логин
+          <input id="auth-login" type="text" autocomplete="username" maxlength="24" required />
+        </label>
+        <label>
+          Пароль
+          <input id="auth-password" type="password" autocomplete="current-password" maxlength="72" required />
+        </label>
+        <p class="acc-error" id="auth-error" role="alert" hidden></p>
+        <button class="btn btn-primary" id="auth-submit" type="submit">Войти</button>
+        <p class="acc-hint" id="auth-hint">
+          Новый клиент кофейни? <a href="#register" id="hint-switch">Зарегистрируйтесь</a>
+        </p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== ЭКРАН КАБИНЕТА ===== -->
+  <section class="acc-screen" id="screen-app" hidden>
+    <div class="acc-app">
+      <div class="acc-tabs" role="tablist">
+        <button class="acc-tab active" id="tab-profile" type="button">Профиль</button>
+        <button class="acc-tab acc-tab-admin" id="tab-knowledge" type="button" hidden>База знаний</button>
+      </div>
+
+      <!-- Профиль -->
+      <div class="acc-pane" id="pane-profile">
+        <div class="acc-profile">
+          <div class="acc-avatar" aria-hidden="true">☕</div>
+          <div>
+            <h2 id="profile-login">…</h2>
+            <p class="acc-role" id="profile-role"></p>
+          </div>
+          <button class="btn btn-outline btn-sm acc-logout" id="btn-logout" type="button">Выйти</button>
+        </div>
+      </div>
+
+      <!-- База знаний (только для админа) -->
+      <div class="acc-pane" id="pane-knowledge" hidden>
+        <p class="acc-note">
+          Текст описывает кофейню для чат-бота. Сохраните — и ассистент на сайте
+          сразу начнёт отвечать по новым данным.
+        </p>
+        <div id="kb-sections"></div>
+        <div class="kb-actions">
+          <button class="btn btn-primary btn-sm" id="kb-save" type="button">Сохранить</button>
+          <span class="kb-status" id="kb-status" role="status"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="/auth.js"></script>
+  <script src="/account.js"></script>
+</body>
+</html>
