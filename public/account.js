@@ -15,6 +15,7 @@
   const authError = document.getElementById('auth-error');
   const authSubmit = document.getElementById('auth-submit');
   const authHint = document.getElementById('auth-hint');
+  const authEye = document.getElementById('auth-password-eye');
 
   const tabProfile = document.getElementById('tab-profile');
   const tabKnowledge = document.getElementById('tab-knowledge');
@@ -22,6 +23,7 @@
   const paneKnowledge = document.getElementById('pane-knowledge');
   const profileLogin = document.getElementById('profile-login');
   const profileRole = document.getElementById('profile-role');
+  const profileRoleDetail = document.getElementById('profile-role-detail');
   const btnLogout = document.getElementById('btn-logout');
 
   let mode = 'login';
@@ -36,8 +38,10 @@
       return;
     }
 
+    const role = user.role === 'admin' ? 'Администратор' : 'Клиент';
     profileLogin.textContent = user.login;
-    profileRole.textContent = user.role === 'admin' ? 'Администратор' : 'Клиент';
+    profileRole.textContent = role;
+    profileRoleDetail.textContent = role;
     tabKnowledge.hidden = user.role !== 'admin';
 
     if (user.role === 'admin' && !kbSectionsBuilt) await buildKbEditor();
@@ -60,6 +64,33 @@
     authPassword.autocomplete = login ? 'current-password' : 'new-password';
     authError.hidden = true;
   }
+
+  /* ---------- «глазик» показа пароля ---------- */
+
+  function setPasswordVisible(visible) {
+    const shown = Boolean(visible);
+    authPassword.type = shown ? 'text' : 'password';
+
+    authEye.querySelector('.acc-eye-open').hidden = shown;
+    authEye.querySelector('.acc-eye-off').hidden = !shown;
+
+    const label = shown ? 'Скрыть пароль' : 'Показать пароль';
+    authEye.setAttribute('aria-label', label);
+    authEye.setAttribute('aria-pressed', String(shown));
+    authEye.title = label;
+  }
+
+  authEye.addEventListener('click', () => {
+    setPasswordVisible(authPassword.type === 'password');
+    // курсор — в конец, иначе после переключения типа он прыгает в начало
+    const end = authPassword.value.length;
+    authPassword.focus();
+    try {
+      authPassword.setSelectionRange(end, end);
+    } catch (_) {
+      /* браузеры, не дающие работать с password-полем, просто не двигают курсор */
+    }
+  });
 
   document.getElementById('tab-login').addEventListener('click', () => setMode('login'));
   document.getElementById('tab-register').addEventListener('click', () => setMode('register'));

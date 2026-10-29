@@ -7,6 +7,7 @@ const express = require('express');
 const OpenAI = require('openai');
 const auth = require('./users');
 const knowledge = require('./knowledge');
+const rag = require('./rag');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
@@ -23,9 +24,31 @@ const DEFAULT_ANSWER =
 
 const OUT_OF_SCOPE = '[[OUT_OF_SCOPE]]';
 
+/**
+ * Ответ, когда похожих фрагментов в базе не нашлось. Формулировка для
+ * посетителя: он не в курсе, что у нас база знаний и RAG, — говорим простыми
+ * словами, что таких данных у бота нет.
+ */
+const NO_ANSWER =
+  'К сожалению, я не владею такой информацией. ' +
+  'Попробуйте спросить про меню, цены, адрес и часы работы — с радостью отвечу.';
+
+const MAX_DOC_BYTES = 1024 * 1024; // 1 МБ — верхняя планка загружаемого файла
+
 const app = express();
 app.disable('x-powered-by');
-app.use(express.json({ limit: '16kb' }));
+
+// Лимиты по телу: 128 КБ с запасом покрывают окно чата (20 реплик по
+// 2000 знаков), админские секции базы знаний длиннее, документы приходят
+// целыми файлами — для них отдельный парсер на маршруте.
+const jsonSmall = express.json({ limit: '128kb' });
+const jsonSections = express.json({ limit: '256kb' });
+
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/documents')) return next();
+  if (req.path.startsWith('/api/knowledge')) return jsonSections(req, res, next);
+  return jsonSmall(req, res, next);
+});
 
 const apiKey = process.env.OPENAI_API_KEY;
 const openai = apiKey ? new OpenAI({ apiKey }) : null;
@@ -96,14 +119,14 @@ function normalizeMessages(body) {
  * Вызов OpenAI. Возвращает текст-заготовку, если ключа нет или API
  * недоступен — чтобы сайт никогда не падал с 500.
  */
-async function askOpenAI(messages) {
+async function askOpenAI(messages, ragContext = '') {
   if (!openai) return DEFAULT_ANSWER;
 
   const res = await openai.chat.completions.create({
     model: MODEL,
     temperature: 0.3,
     max_tokens: 400,
-    messages: [{ role: 'system', content: knowledge.buildSystemPrompt() }, ...messages],
+    messages: [{ role: 'system', content: knowledge.buildSystemPrompt() + ragContext }, ...messages],
   });
 
   const text = res.choices?.[0]?.message?.content?.trim();
@@ -212,9 +235,38 @@ app.post('/api/chat', rateLimit, async (req, res) => {
     return res.status(400).json({ error: 'bad_request', message: 'Нужно сообщение с содержимым.' });
   }
 
+  // 1. Ищем вопрос в базе знаний. Пока документов не загружено, база пуста и
+  //    бот работает как раньше — по системным подсказкам из knowledge.js.
+  let ragContext = '';
+  let sources = [];
+
+  if (!rag.isEmpty()) {
+    const question = messages[messages.length - 1].content;
+
+    let found;
+    try {
+      found = await rag.search(question);
+    } catch (err) {
+      // Эмбеддинг вопроса — тот же OpenAI, что и ответ: при его недоступности
+      // модель всё равно не ответит, так что деградируем как при сбое chat.
+      console.error('[/api/chat] поиск по базе знаний:', err?.message ?? err);
+      return res.json({ reply: DEFAULT_ANSWER, sources: [], degraded: true });
+    }
+
+    // 2. Слишком далёкие фрагменты — не выдумываем, а зовём на помощь админа.
+    if (found.best < rag.MIN_SIMILARITY) {
+      return res.json({ reply: NO_ANSWER, sources: [] });
+    }
+
+    // 3. Ответим по найденным фрагментам, а их названия покажем пользователю.
+    ragContext = rag.buildPrompt(found.top);
+    sources = [...new Set(found.top.map((c) => c.title))];
+  }
+
   try {
-    const reply = await askOpenAI(messages);
-    res.json({ reply });
+    const reply = await askOpenAI(messages, ragContext);
+    // Ответ-заготовка к базовому знанию не относится — не ищем в нём источник.
+    res.json({ reply, sources: reply === DEFAULT_ANSWER ? [] : sources });
   } catch (err) {
     const status = err?.status ?? err?.response?.status;
     console.error(`[/api/chat] ${status ?? ''} ${err?.message ?? err}`);
@@ -224,8 +276,58 @@ app.post('/api/chat', rateLimit, async (req, res) => {
     if (status === 401 || status === 403) {
       return res.status(502).json({ error: 'ai_auth', message: 'Проверьте OPENAI_API_KEY на сервере.' });
     }
-    res.json({ reply: DEFAULT_ANSWER, degraded: true });
+    res.json({ reply: DEFAULT_ANSWER, sources: [], degraded: true });
   }
+});
+
+/* ------------------------------------------------------------------ *
+ *  Документы базы знаний (только администратор)
+ *
+ *  Файл читается в браузере как текст и приходит JSON'ом: .txt и .md —
+ *  это текст, multipart-парсер ради этого не нужен.
+ * ------------------------------------------------------------------ */
+const jsonDoc = express.json({ limit: '3mb' });
+
+app.get('/api/documents', requireAdmin, (_req, res) => {
+  res.json({ documents: rag.listDocuments(), threshold: rag.MIN_SIMILARITY, top: rag.TOP_K });
+});
+
+app.post('/api/documents', requireAdmin, rateLimit, jsonDoc, async (req, res) => {
+  const { filename, content } = req.body || {};
+
+  if (!rag.allowedExtension(filename)) {
+    return res.status(400).json({ error: 'bad_request', message: 'Принимаются файлы .txt и .md' });
+  }
+  if (typeof content !== 'string' || !content.trim()) {
+    return res.status(400).json({ error: 'bad_request', message: 'В файле нет текста' });
+  }
+  if (Buffer.byteLength(content, 'utf8') > MAX_DOC_BYTES) {
+    return res.status(413).json({ error: 'too_large', message: 'Файл больше 1 МБ' });
+  }
+
+  try {
+    const doc = await rag.addDocument(filename, content);
+    // Содержимое документа в лог не пишем — только заголовок и размеры.
+    console.log(`[rag] ${doc.title}: фрагментов ${doc.chunks}`);
+    return res.json({ document: doc });
+  } catch (err) {
+    console.error('[rag] индексация:', err?.message ?? err);
+    return res.status(502).json({ error: 'index_failed', message: 'Документ не проиндексирован' });
+  }
+});
+
+app.post('/api/documents/:id/reindex', requireAdmin, rateLimit, async (req, res) => {
+  const doc = await rag.reindexDocument(Number(req.params.id) || 0);
+  if (!doc) return res.status(404).json({ error: 'not_found', message: 'Документ не найден' });
+  console.log(`[rag] переиндексация ${doc.title}: фрагментов ${doc.chunks}`);
+  res.json({ document: doc });
+});
+
+app.delete('/api/documents/:id', requireAdmin, (req, res) => {
+  if (!rag.removeDocument(Number(req.params.id) || 0)) {
+    return res.status(404).json({ error: 'not_found', message: 'Документ не найден' });
+  }
+  res.json({ ok: true });
 });
 
 // Статика — в самый конец, чтобы /api/* имела приоритет.
@@ -241,10 +343,13 @@ app.use(
 // Кабинет — чистый URL вместо account.html.
 app.get('/account', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'account.html')));
 
+// Админка базы данных — вместо admin.html.
+app.get('/admin', (_req, res) => res.sendFile(path.join(PUBLIC_DIR, 'admin.html')));
+
 // Фолбэк для несуществующих путей — на index, как у SPA-подобных лендингов.
 app.get(/^(?!\/api\/|\/account).*/, (_req, res) => res.redirect('/'));
 
-module.exports = { app, normalizeMessages, DEFAULT_ANSWER };
+module.exports = { app, normalizeMessages, DEFAULT_ANSWER, NO_ANSWER };
 
 // Слушатель поднимаем только при прямом запуске — чтобы модуль можно было
 // импортировать в тестах, не занимая порт.

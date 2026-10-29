@@ -57,6 +57,16 @@
     return el;
   }
 
+  /** Подпись под ответом: из каких документов собран ответ. */
+  function sources(list) {
+    if (!Array.isArray(list) || !list.length) return;
+    const el = document.createElement('div');
+    el.className = 'chat-msg chat-msg-sources';
+    el.textContent = `Источники: ${list.join(', ')}`;
+    log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
+  }
+
   function typing() {
     const el = document.createElement('div');
     el.className = 'chat-msg chat-msg-bot chat-msg-typing';
@@ -141,6 +151,7 @@
       spinner.remove();
       history.push({ role: 'assistant', content: data.reply });
       bubble('bot', data.reply);
+      sources(data.sources);
       save();
       setStatus(data.degraded ? 'работает в упрощённом режиме' : 'онлайн', Boolean(data.degraded));
     } catch (err) {

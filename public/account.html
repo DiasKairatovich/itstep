@@ -38,7 +38,27 @@
         </label>
         <label>
           Пароль
-          <input id="auth-password" type="password" autocomplete="current-password" maxlength="72" required />
+          <span class="acc-pass">
+            <input id="auth-password" type="password" autocomplete="current-password" maxlength="72" required />
+            <button
+              class="acc-eye"
+              id="auth-password-eye"
+              type="button"
+              aria-label="Показать пароль"
+              aria-pressed="false"
+              title="Показать пароль"
+            >
+              <svg class="acc-eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" />
+                <circle cx="12" cy="12" r="2.8" />
+              </svg>
+              <svg class="acc-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" hidden>
+                <path d="M2 12s3.6-6.5 10-6.5c1.6 0 3 .4 4.2 1M22 12s-3.6 6.5-10 6.5c-1.6 0-3-.4-4.2-1" />
+                <path d="M9.9 9.9a2.8 2.8 0 0 0 4 4" />
+                <path d="M4 4l16 16" />
+              </svg>
+            </button>
+          </span>
         </label>
         <p class="acc-error" id="auth-error" role="alert" hidden></p>
         <button class="btn btn-primary" id="auth-submit" type="submit">Войти</button>
@@ -52,6 +72,16 @@
   <!-- ===== ЭКРАН КАБИНЕТА ===== -->
   <section class="acc-screen" id="screen-app" hidden>
     <div class="acc-app">
+      <!-- Заголовок общий для обеих вкладок: при переключении не «прыгает» -->
+      <div class="acc-profile">
+        <div class="acc-avatar" aria-hidden="true">☕</div>
+        <div>
+          <h2>Профиль</h2>
+          <p class="acc-role" id="profile-role"></p>
+        </div>
+        <button class="btn btn-outline btn-sm acc-logout" id="btn-logout" type="button">Выйти</button>
+      </div>
+
       <div class="acc-tabs" role="tablist">
         <button class="acc-tab active" id="tab-profile" type="button">Профиль</button>
         <button class="acc-tab acc-tab-admin" id="tab-knowledge" type="button" hidden>База знаний</button>
@@ -59,14 +89,16 @@
 
       <!-- Профиль -->
       <div class="acc-pane" id="pane-profile">
-        <div class="acc-profile">
-          <div class="acc-avatar" aria-hidden="true">☕</div>
-          <div>
-            <h2 id="profile-login">…</h2>
-            <p class="acc-role" id="profile-role"></p>
+        <dl class="acc-facts">
+          <div class="acc-fact">
+            <dt>Логин</dt>
+            <dd id="profile-login">…</dd>
           </div>
-          <button class="btn btn-outline btn-sm acc-logout" id="btn-logout" type="button">Выйти</button>
-        </div>
+          <div class="acc-fact">
+            <dt>Роль</dt>
+            <dd id="profile-role-detail">…</dd>
+          </div>
+        </dl>
       </div>
 
       <!-- База знаний (только для админа) -->
@@ -74,6 +106,10 @@
         <p class="acc-note">
           Текст описывает кофейню для чат-бота. Сохраните — и ассистент на сайте
           сразу начнёт отвечать по новым данным.
+        </p>
+        <p class="acc-note">
+          Файлы <code>.txt</code> и <code>.md</code> с ответами по базе знаний
+          загружаются отдельно — <a href="/admin">документы базы знаний</a>.
         </p>
         <div id="kb-sections"></div>
         <div class="kb-actions">

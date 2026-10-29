@@ -1197,3 +1197,114 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; line-height: 1.15; }
   .acc-profile { flex-wrap: wrap; }
   .acc-logout { margin-left: 0; width: 100%; }
 }
+
+/* === RAG: источники под ответом и админка документов === */
+.chat-msg-sources {
+  align-self: flex-start;
+  background: none;
+  border: 0;
+  padding: 0 14px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  animation: chatIn 0.25s ease both;
+}
+
+.rag-wrap { width: 100%; max-width: 860px; }
+.rag-wrap h2 { color: var(--brown-dark); margin-bottom: 10px; }
+.rag-wrap code { font-family: ui-monospace, monospace; font-size: 0.86em; }
+
+.rag-upload { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
+.rag-upload input[type='file'] { font: inherit; font-size: 0.86rem; color: var(--text-muted); }
+.rag-status { font-size: 0.85rem; color: var(--brown); }
+.rag-status[data-state='off'] { color: #8d2b22; }
+
+.rag-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.rag-table th {
+  text-align: left;
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--cream-dark);
+}
+.rag-table td { padding: 10px; vertical-align: middle; border-bottom: 1px solid var(--cream-dark); }
+.rag-empty { color: var(--text-muted); font-style: italic; }
+.rag-hint { margin-top: 18px; font-size: 0.8rem; color: var(--text-muted); }
+
+.rag-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--amber);
+  cursor: pointer;
+  text-decoration: underline;
+  margin-right: 14px;
+}
+.rag-link-danger { color: #8d2b22; }
+
+/* === Кабинет: «глазик» показа пароля === */
+.acc-pass {
+  position: relative;
+  display: block;
+}
+
+.acc-pass input {
+  width: 100%;
+  padding-right: 46px;
+}
+
+.acc-eye {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.acc-eye:hover { color: var(--amber); background: var(--cream-dark); }
+.acc-eye:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.acc-eye svg[hidden] { display: none; }
+
+/* === Кабинет: детали профиля === */
+.acc-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.acc-fact {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--cream-dark);
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+}
+
+.acc-fact dt {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.acc-fact dd { font-size: 0.95rem; color: var(--brown-dark); font-weight: 600; }

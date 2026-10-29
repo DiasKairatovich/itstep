@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Документы базы знаний — Coffee Point</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="account-page">
+
+  <nav class="navbar scrolled">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-icon">☕</span>
+        <span class="logo-text">Coffee Point</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="/account" class="nav-link">Кабинет</a></li>
+        <li><a href="/" class="nav-link">На сайт</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===== ВХОД ===== -->
+  <section class="acc-screen" id="screen-auth" hidden>
+    <div class="acc-card">
+      <h2>Документы базы знаний</h2>
+      <p class="acc-note">Страница доступна администратору. Войдите — или загрузите документ из кабинета.</p>
+      <form class="acc-form" id="auth-form" novalidate>
+        <label>
+          Логин
+          <input id="auth-login" type="text" autocomplete="username" maxlength="24" value="admin" />
+        </label>
+        <label>
+          Пароль
+          <input id="auth-password" type="password" autocomplete="current-password" maxlength="72" required />
+        </label>
+        <p class="acc-error" id="auth-error" role="alert" hidden></p>
+        <button class="btn btn-primary" id="auth-submit" type="submit">Войти</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== СПИСОК ДОКУМЕНТОВ ===== -->
+  <section class="acc-screen" id="screen-docs" hidden>
+    <div class="acc-app rag-wrap">
+      <h2>Документы базы знаний</h2>
+      <p class="acc-note">
+        Файлы <code>.txt</code> и <code>.md</code> до 1 МБ. Каждый файл режется на фрагменты,
+        каждый фрагмент получает вектор; бот отвечает по ближайшим фрагментам и называет файл-источник.
+      </p>
+
+      <form class="rag-upload" id="upload-form">
+        <input id="upload-file" type="file" accept=".txt,.md" required />
+        <button class="btn btn-primary btn-sm" id="upload-btn" type="submit">Загрузить</button>
+        <span class="rag-status" id="upload-status" role="status"></span>
+      </form>
+
+      <table class="rag-table">
+        <thead>
+          <tr>
+            <th>Документ</th>
+            <th>Фрагментов</th>
+            <th>Заведён</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="docs-body">
+          <tr><td colspan="4" class="rag-empty">Документов пока нет.</td></tr>
+        </tbody>
+      </table>
+
+      <p class="rag-hint" id="threshold"></p>
+    </div>
+  </section>
+
+  <script src="/auth.js"></script>
+  <script src="/admin.js"></script>
+</body>
+</html>
