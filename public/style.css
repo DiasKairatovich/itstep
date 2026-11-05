@@ -1308,3 +1308,45 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; line-height: 1.15; }
 }
 
 .acc-fact dd { font-size: 0.95rem; color: var(--brown-dark); font-weight: 600; }
+
+/* ---------- Кабинет: вкладки и обращения менеджеру (Практика №2б) ---------- */
+
+.acc-tabs {
+  display: flex;
+  gap: 18px;
+  align-items: baseline;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--cream-dark);
+}
+
+.tab { font-size: 0.9rem; font-weight: 700; color: var(--brown-dark); }
+.tab-active { border-bottom: 2px solid var(--amber); padding-bottom: 2px; }
+
+.cases-list { display: grid; gap: 12px; }
+
+.case {
+  padding: 14px 16px;
+  border: 1px solid var(--cream-dark);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+}
+
+.case--done { border-left-color: var(--brown); background: var(--cream); }
+
+.case-meta { margin: 0 0 6px; font-size: 0.74rem; color: var(--text-muted); }
+.case-q { margin: 0 0 10px; font-size: 0.95rem; color: var(--brown-dark); font-weight: 600; }
+.case-a { margin: 0; font-size: 0.9rem; color: var(--brown); font-style: italic; }
+
+.case-form { display: grid; gap: 8px; }
+
+.case-form textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--cream-dark);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+

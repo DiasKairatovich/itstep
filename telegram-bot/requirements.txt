@@ -1,0 +1,7 @@
+# Практика №1: Telegram-бот, который ходит в RAG-backend сайта.
+# 22.x: более старые ветки не работают на Python 3.13+ (asyncio.get_event_loop).
+python-telegram-bot>=22.0,<23
+# запросы к backend сайта
+httpx>=0.27
+# чтение telegram-bot/.env
+python-dotenv>=1.0

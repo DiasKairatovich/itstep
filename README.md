@@ -22,7 +22,8 @@
 │   └── admin.js       # клиент страницы документов
 ├── eval/               # вопросы для самопроверки: node eval/run.js
 ├── sample_docs/        # два тестовых документа
-├── data/               # users.json, knowledge.json, rag.db (не в git)
+├── telegram-bot/       # Telegram-бот: сценарии, AI-адаптер, письма менеджеру
+├── data/               # users.json, knowledge.json, rag.db, handoffs.db (не в git)
 └── .env                # секреты (не в git)
 ```
 
@@ -33,6 +34,25 @@ npm install
 cp .env.example .env    # и впишите свои значения
 npm start               # http://localhost:3456
 ```
+
+### Два терминала: сайт и бот
+
+Telegram-бот — отдельный процесс, сайт сам его не поднимает.
+
+```bash
+# Терминал 1 — сайт
+npm start
+
+# Терминал 2 — бот (тот же корень проекта, venv один на весь проект)
+python3 -m venv .venv && .venv/bin/pip install -r telegram-bot/requirements.txt  # один раз
+.venv/bin/python telegram-bot/bot.py
+```
+
+Остановить — `Ctrl+C` в соответствующем терминале. Три правила:
+
+* бот в **одном** экземпляре: второй поллер получит `409 Conflict` от `getUpdates`, а сайт на тот же порт — `EADDRINUSE`;
+* боту нужен сайт (`BACKEND_URL`), без него он отвечает заготовкой «попозже»;
+* `BACKEND_MODE=mock` в `.env` — бот отвечает заглушкой: проверяем кнопки, журнал и письма, не тратя токены.
 
 При первом запуске из `ADMIN_LOGIN`/`ADMIN_PASSWORD` (или
 `admin`/`admin123`, если переменные не заданы) создаётся администратор. Клиенты
@@ -87,13 +107,18 @@ npm start               # http://localhost:3456
 ### Самопроверка
 
 ```bash
-node eval/run.js          # вопросы из eval/questions.json через /api/chat
+node eval/run.js                                        # вопросы RAG через /api/chat
+.venv/bin/python telegram-bot/test_offline.py           # бот: кнопки, письмо менеджеру, троттл
 ```
 
-Скрипт индексирует `sample_docs/`, поднимает сервер на свободном порту и
-печатает вопрос, ответ и источники. В `questions.json` обычные вопросы имеют
-поле `expect` (документ-источник), а ловушки — `"trap": true`: бот обязан
+`node eval/run.js` индексирует `sample_docs/`, поднимает сервер на свободном
+порту и печатает вопрос, ответ и источники. В `questions.json` обычные вопросы
+имеют поле `expect` (документ-источник), а ловушки — `"trap": true`: бот обязан
 признаться, что ответа в базе нет.
+
+`telegram-bot/test_offline.py` подменяет `Update`, `Bot` и отправку письма
+фиктивными классами: проверяет кнопки, письмо менеджеру и троттл без сети, без
+SMTP и без платных токенов ИИ.
 
 ## Личный кабинет
 

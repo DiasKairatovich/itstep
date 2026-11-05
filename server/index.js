@@ -8,6 +8,7 @@ const OpenAI = require('openai');
 const auth = require('./users');
 const knowledge = require('./knowledge');
 const rag = require('./rag');
+const handoffs = require('./handoffs');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
@@ -330,12 +331,44 @@ app.delete('/api/documents/:id', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
+/* ------------------------------------------------------------------ *
+ *  Обращения «нужен человек» (Практика №2б)
+ *
+ *  Telegram-бот пишет POST /api/handoffs, менеджер отвечает в кабинете,
+ *  бот забирает ответ GET /api/handoffs/outgoing и сам отправляет клиенту.
+ *  Запись открыта, как и /api/chat: стенд локальный, доступ к сети наружу
+ *  решает, кто может писать.
+ * ------------------------------------------------------------------ */
+app.post('/api/handoffs', rateLimit, (req, res) => {
+  const { session_id, channel, question } = req.body || {};
+  if (!session_id || !question) {
+    return res.status(400).json({ error: 'bad_request', message: 'Нужны session_id и question.' });
+  }
+  res.status(201).json({ handoff: handoffs.create({ session_id, channel, question }) });
+});
+
+app.get('/api/handoffs', requireAdmin, (_req, res) => {
+  res.json({ handoffs: handoffs.list() });
+});
+
+app.get('/api/handoffs/outgoing', (_req, res) => {
+  const replies = handoffs.claimOutgoing().map(({ id, session_id, reply }) => ({ id, session_id, reply }));
+  res.json({ replies });
+});
+
+app.post('/api/handoffs/:id/reply', requireAdmin, (req, res) => {
+  const handoff = handoffs.setReply(Number(req.params.id) || 0, req.body?.reply);
+  if (!handoff) return res.status(400).json({ error: 'bad_request', message: 'Пустой ответ или такого обращения нет.' });
+  res.json({ handoff });
+});
+
 // Статика — в самый конец, чтобы /api/* имела приоритет.
 app.use(
   express.static(PUBLIC_DIR, {
     extensions: ['html'],
     setHeaders(res, filePath) {
-      if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
+      // Админка меняется часто, а браузер иначе держит старый JS/CSS.
+      if (/\.(html|js|css)$/.test(filePath)) res.setHeader('Cache-Control', 'no-cache');
     },
   })
 );

@@ -19,8 +19,12 @@
 
   const tabProfile = document.getElementById('tab-profile');
   const tabKnowledge = document.getElementById('tab-knowledge');
+  const tabCases = document.getElementById('tab-cases');
   const paneProfile = document.getElementById('pane-profile');
   const paneKnowledge = document.getElementById('pane-knowledge');
+  const paneCases = document.getElementById('pane-cases');
+  const casesList = document.getElementById('cases-list');
+  const casesStatus = document.getElementById('cases-status');
   const profileLogin = document.getElementById('profile-login');
   const profileRole = document.getElementById('profile-role');
   const profileRoleDetail = document.getElementById('profile-role-detail');
@@ -43,6 +47,8 @@
     profileRole.textContent = role;
     profileRoleDetail.textContent = role;
     tabKnowledge.hidden = user.role !== 'admin';
+    tabCases.hidden = user.role !== 'admin';
+    if (user.role !== 'admin') showPane('profile');
 
     if (user.role === 'admin' && !kbSectionsBuilt) await buildKbEditor();
 
@@ -127,15 +133,18 @@
   /* ---------- вкладки ---------- */
 
   function showPane(which) {
-    const knowledge = which === 'knowledge';
-    tabProfile.classList.toggle('active', !knowledge);
-    tabKnowledge.classList.toggle('active', knowledge);
-    paneProfile.hidden = knowledge;
-    paneKnowledge.hidden = !knowledge;
+    tabProfile.classList.toggle('active', which === 'profile');
+    tabKnowledge.classList.toggle('active', which === 'knowledge');
+    tabCases.classList.toggle('active', which === 'cases');
+    paneProfile.hidden = which !== 'profile';
+    paneKnowledge.hidden = which !== 'knowledge';
+    paneCases.hidden = which !== 'cases';
+    if (which === 'cases') refreshCases();
   }
 
   tabProfile.addEventListener('click', () => showPane('profile'));
   tabKnowledge.addEventListener('click', () => showPane('knowledge'));
+  tabCases.addEventListener('click', () => showPane('cases'));
 
   btnLogout.addEventListener('click', async () => {
     await Auth.logout();
@@ -188,6 +197,106 @@
     try { data = await res.json(); } catch (_) { /* ignore */ }
     return { ok: res.ok, data };
   }
+
+  /* ---------- обращения: нужен человек (Практика №2б) ---------- */
+
+  const CASE_STATUS = { new: 'ждёт ответа', answered: 'ответ уйдёт клиенту' };
+
+  // Черновики ответов: список перечитывается каждые 10 секунд, и без этого
+  // незапечатанный текст в textarea исчезал бы на глазах у менеджера.
+  const drafts = new Map();
+
+  async function postJSON(path, body) {
+    const res = await fetch('/api' + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      credentials: 'same-origin',
+    });
+    let data = null;
+    try { data = await res.json(); } catch (_) { /* ignore */ }
+    return { ok: res.ok, data };
+  }
+
+  function casesSay(text) {
+    casesStatus.textContent = text;
+    setTimeout(() => { casesStatus.textContent = ''; }, 5000);
+  }
+
+  function caseCard(item) {
+    const card = document.createElement('article');
+    card.className = item.reply ? 'case case--done' : 'case';
+
+    const meta = document.createElement('p');
+    meta.className = 'case-meta';
+    meta.textContent = `${new Date(item.created_at).toLocaleString('ru')} · ${item.session_id} · ${CASE_STATUS[item.status] || item.status}`;
+
+    const question = document.createElement('p');
+    question.className = 'case-q';
+    question.textContent = item.question;
+
+    card.append(meta, question);
+
+    if (item.reply) {
+      const answer = document.createElement('p');
+      answer.className = 'case-a';
+      answer.textContent = `Ответ: ${item.reply}`;
+      card.append(answer);
+      return card;
+    }
+
+    const form = document.createElement('form');
+    form.className = 'case-form';
+    const input = document.createElement('textarea');
+    input.rows = 3;
+    input.placeholder = 'Ответ клиенту — он придёт ему в Telegram';
+    input.value = drafts.get(item.id) || '';
+    input.addEventListener('input', () => {
+      if (input.value.trim()) drafts.set(item.id, input.value);
+      else drafts.delete(item.id);
+    });
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-primary btn-sm';
+    btn.type = 'submit';
+    btn.textContent = 'Ответить';
+    form.append(input, btn);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const reply = input.value.trim();
+      if (!reply) return;
+      input.disabled = true;
+      const { ok, data } = await postJSON(`/handoffs/${item.id}/reply`, { reply });
+      input.disabled = false;
+      if (!ok) return casesSay(data?.message || 'Сервер не ответил.');
+      drafts.delete(item.id);
+      casesSay('Ответ отправлен, бот отнесёт его клиенту.');
+      await refreshCases();
+    });
+
+    card.append(form);
+    return card;
+  }
+
+  async function refreshCases() {
+    const { ok, data } = await fetchJSON('/handoffs');
+    if (!ok) return;
+
+    casesList.textContent = '';
+    const waiting = data.handoffs.filter((item) => item.status === 'new').length;
+    tabCases.textContent = waiting ? `Обращения: ${waiting}` : 'Обращения';
+
+    if (!data.handoffs.length) {
+      casesList.textContent = 'Пока пусто: бот никого не звал.';
+      return;
+    }
+    casesList.append(...data.handoffs.map(caseCard));
+  }
+
+  // Менеджер держит вкладку открытой — подтягиваем новые обращения сами.
+  setInterval(() => {
+    if (!paneCases.hidden) refreshCases();
+  }, 10000);
 
   await refresh();
 })();

@@ -17,6 +17,8 @@
   const uploadBtn = document.getElementById('upload-btn');
   const uploadStatus = document.getElementById('upload-status');
   const docsBody = document.getElementById('docs-body');
+  const casesList = document.getElementById('cases-list');
+  const casesStatus = document.getElementById('cases-status');
   const threshold = document.getElementById('threshold');
 
   /* ---------- запросы ---------- */

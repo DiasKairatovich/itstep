@@ -2,6 +2,9 @@
 node_modules/
 .npm-cache/
 
+# Виртуальное окружение Python (бот Practice 1)
+.venv/
+
 # Секреты — никогда не коммитим
 .env
 .env.local

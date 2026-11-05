@@ -85,6 +85,7 @@
       <div class="acc-tabs" role="tablist">
         <button class="acc-tab active" id="tab-profile" type="button">Профиль</button>
         <button class="acc-tab acc-tab-admin" id="tab-knowledge" type="button" hidden>База знаний</button>
+        <button class="acc-tab acc-tab-admin" id="tab-cases" type="button" hidden>Обращения</button>
       </div>
 
       <!-- Профиль -->
@@ -116,6 +117,16 @@
           <button class="btn btn-primary btn-sm" id="kb-save" type="button">Сохранить</button>
           <span class="kb-status" id="kb-status" role="status"></span>
         </div>
+      </div>
+
+      <!-- Обращения: нужен человек (только для админа) -->
+      <div class="acc-pane" id="pane-cases" hidden>
+        <p class="acc-note">
+          Вопросы, которые бот не смог закрыть сам. Ответ придёт клиенту в Telegram —
+          в сам Telegram менеджеру заходить не нужно.
+        </p>
+        <p class="kb-status" id="cases-status" role="status"></p>
+        <div id="cases-list" class="cases-list"></div>
       </div>
     </div>
   </section>
