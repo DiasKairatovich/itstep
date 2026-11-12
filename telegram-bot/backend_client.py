@@ -98,4 +98,9 @@ async def ask_backend(
         log.warning("[%s] backend ответил degraded", session_id)
 
     needs_human = data.get("needs_human")
-    return {"answer": answer.strip(), "needs_human": bool(needs_human)}
+    meta = data.get("meta")  # is_fallback, tokens_in/out, cost_usd — для analytics.db
+    return {
+        "answer": answer.strip(),
+        "needs_human": bool(needs_human),
+        "meta": meta if isinstance(meta, dict) else None,
+    }

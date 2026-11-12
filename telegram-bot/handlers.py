@@ -10,6 +10,7 @@ import asyncio
 import json
 import logging
 import os
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -22,6 +23,15 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+
+# analytics/ лежит в корне проекта, на уровень выше telegram-bot/.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from analytics import db as analytics_db  # noqa: E402
+
+try:
+    analytics_db.init_db()
+except Exception:  # noqa: BLE001  — аналитика не должна мешать старту бота
+    logging.getLogger(__name__).exception("аналитика: init_db не удался")
 
 import backend_client
 import mailer
@@ -60,11 +70,45 @@ def _remember(session_id: str, role: str, content: str) -> None:
     del DIALOGS[session_id][:-MAX_STORED]
 
 
-def _log_exchange(session_id: str, message: str, answer: str, needs_human: bool, route: str) -> None:
+def _track(
+    session_id: str, message: str, answer: str, needs_human: bool, route: str, meta: dict | None, lead: bool
+) -> None:
+    """Запись в analytics.db. Любой сбой гасим: бот отвечает клиенту при любом исходе."""
+    try:
+        meta = meta or {}
+        # route=manager: реплика менеджера, текст клиента в обмене не участвует.
+        user_text = "" if route == "manager" else message
+        analytics_db.log_exchange(
+            session_id,
+            "telegram",
+            user_text,
+            answer,
+            is_fallback=bool(meta.get("is_fallback")),
+            tokens_in=meta.get("tokens_in"),
+            tokens_out=meta.get("tokens_out"),
+            cost=meta.get("cost_usd"),
+            handed_to_manager=needs_human,
+            lead_created=lead,
+        )
+    except Exception:  # noqa: BLE001
+        log.exception("аналитика: сбой в _track")
+
+
+def _log_exchange(
+    session_id: str,
+    message: str,
+    answer: str,
+    needs_human: bool,
+    route: str,
+    meta: dict | None = None,
+    lead: bool = False,
+) -> None:
     """Одна строка JSON на обмен: понадобится Практике №2а и №4.
 
     ``route`` — ``scenario`` (без затрат) или ``backend`` (платный ИИ).
+    ``meta`` — токены/стоимость/is_fallback из ответа backend; ``lead`` — заявка.
     """
+    _track(session_id, message, answer, needs_human, route, meta, lead)
     row = {
         "time": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "session_id": session_id,
@@ -343,10 +387,12 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     dialog = _history(session_id)
     scenario = scenarios.match(text) if _hybrid_enabled() else None
     handoff_reason = ""
+    meta, lead = None, False
 
     if mailer.needs_human(text):
         # Заказ/менеджер/сотрудничество: платный запрос не тратим, зовём человека.
         answer, needs_human, route = scenarios.HANDOFF, True, "handoff"
+        lead = True  # [УТОЧНИТЬ] определение лида: сейчас = сработали слова «заявка»
         words = ", ".join(mailer.matched_words(text)) or "ключевые слова"
         handoff_reason = f"в сообщении клиента прозвучала заявка: {words}"
     elif scenario:
@@ -357,6 +403,7 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         try:
             result = await backend_client.ask_backend(session_id, text, history=dialog)
             answer, needs_human = str(result["answer"]), bool(result["needs_human"])
+            meta = result.get("meta")
             if needs_human:  # backend сам попросил человека
                 answer = f"{answer}\n\n{scenarios.HANDOFF}"
                 handoff_reason = "backend ответил: нужен человек"
@@ -371,7 +418,7 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     _remember(session_id, "user", text)
     _remember(session_id, "assistant", answer)
-    _log_exchange(session_id, text, answer, needs_human, route)
+    _log_exchange(session_id, text, answer, needs_human, route, meta=meta, lead=lead)
 
     await update.message.reply_text(answer[:TELEGRAM_TEXT_LIMIT])
 

@@ -1,0 +1,5 @@
+{
+  "_comment": "ЗАГЛУШКИ. Подставьте актуальные цены в USD за 1 млн токенов с https://openai.com/api/pricing/. Пока значение null, cost_usd в базе остаётся NULL.",
+  "gpt-4o-mini": { "input_per_1m_usd": null, "output_per_1m_usd": null },
+  "text-embedding-3-small": { "input_per_1m_usd": null, "output_per_1m_usd": null }
+}

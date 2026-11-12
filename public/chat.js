@@ -107,8 +107,22 @@
 
   /* ---------- Сеть ---------- */
 
+  /** Идентификатор сессии для аналитики: живёт, пока открыта вкладка. */
+  function sessionId() {
+    try {
+      let id = sessionStorage.getItem('cp_analytics_sid');
+      if (!id) {
+        id = `web_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36)}`;
+        sessionStorage.setItem('cp_analytics_sid', id);
+      }
+      return id;
+    } catch (_) {
+      return undefined;
+    }
+  }
+
   async function ask(question) {
-    const payload = { messages: history.slice(-HISTORY_LIMIT * 2) };
+    const payload = { messages: history.slice(-HISTORY_LIMIT * 2), session_id: sessionId(), channel: 'website' };
 
     const res = await fetch(ENDPOINT, {
       method: 'POST',

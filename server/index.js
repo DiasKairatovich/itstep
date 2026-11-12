@@ -9,6 +9,7 @@ const auth = require('./users');
 const knowledge = require('./knowledge');
 const rag = require('./rag');
 const handoffs = require('./handoffs');
+const analytics = require('./analytics');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
@@ -121,7 +122,7 @@ function normalizeMessages(body) {
  * недоступен — чтобы сайт никогда не падал с 500.
  */
 async function askOpenAI(messages, ragContext = '') {
-  if (!openai) return DEFAULT_ANSWER;
+  if (!openai) return { text: DEFAULT_ANSWER, usage: null, fallback: false };
 
   const res = await openai.chat.completions.create({
     model: MODEL,
@@ -130,10 +131,12 @@ async function askOpenAI(messages, ragContext = '') {
     messages: [{ role: 'system', content: knowledge.buildSystemPrompt() + ragContext }, ...messages],
   });
 
+  const usage = res.usage ? { in: res.usage.prompt_tokens, out: res.usage.completion_tokens } : null;
   const text = res.choices?.[0]?.message?.content?.trim();
-  if (!text) return DEFAULT_ANSWER;
-  if (text.includes(OUT_OF_SCOPE)) return DEFAULT_ANSWER;
-  return text;
+  // fallback = «ответа в базе знаний нет»: модель сама сказала «вне темы» либо промолчала.
+  if (!text) return { text: DEFAULT_ANSWER, usage, fallback: true };
+  if (text.includes(OUT_OF_SCOPE)) return { text: DEFAULT_ANSWER, usage, fallback: true };
+  return { text, usage, fallback: false };
 }
 
 /* ------------------------------------------------------------------ *
@@ -236,14 +239,34 @@ app.post('/api/chat', rateLimit, async (req, res) => {
     return res.status(400).json({ error: 'bad_request', message: 'Нужно сообщение с содержимым.' });
   }
 
+  // Аналитика: пишем, только если клиент прислал session_id (сайт присылает;
+  // Telegram-бот пишет свои обмены сам, из Python). Сбой записи ответ не ломает.
+  const question = messages[messages.length - 1].content;
+  const sessionId = analytics.cleanSessionId(req.body?.session_id);
+  const respond = (payload, meta = {}) => {
+    const m = { is_fallback: false, tokens_in: null, tokens_out: null, cost_usd: null, ...meta };
+    if (sessionId) {
+      analytics.logExchange({
+        sessionId,
+        channel: analytics.cleanChannel(req.body?.channel),
+        isTest: req.body?.is_test === true,
+        userText: question,
+        botText: payload.reply,
+        isFallback: m.is_fallback,
+        tokensIn: m.tokens_in,
+        tokensOut: m.tokens_out,
+        cost: m.cost_usd,
+      });
+    }
+    return res.json({ ...payload, meta: m });
+  };
+
   // 1. Ищем вопрос в базе знаний. Пока документов не загружено, база пуста и
   //    бот работает как раньше — по системным подсказкам из knowledge.js.
   let ragContext = '';
   let sources = [];
 
   if (!rag.isEmpty()) {
-    const question = messages[messages.length - 1].content;
-
     let found;
     try {
       found = await rag.search(question);
@@ -251,12 +274,12 @@ app.post('/api/chat', rateLimit, async (req, res) => {
       // Эмбеддинг вопроса — тот же OpenAI, что и ответ: при его недоступности
       // модель всё равно не ответит, так что деградируем как при сбое chat.
       console.error('[/api/chat] поиск по базе знаний:', err?.message ?? err);
-      return res.json({ reply: DEFAULT_ANSWER, sources: [], degraded: true });
+      return respond({ reply: DEFAULT_ANSWER, sources: [], degraded: true });
     }
 
     // 2. Слишком далёкие фрагменты — не выдумываем, а зовём на помощь админа.
     if (found.best < rag.MIN_SIMILARITY) {
-      return res.json({ reply: NO_ANSWER, sources: [] });
+      return respond({ reply: NO_ANSWER, sources: [] }, { is_fallback: true });
     }
 
     // 3. Ответим по найденным фрагментам, а их названия покажем пользователю.
@@ -265,9 +288,17 @@ app.post('/api/chat', rateLimit, async (req, res) => {
   }
 
   try {
-    const reply = await askOpenAI(messages, ragContext);
+    const { text: reply, usage, fallback } = await askOpenAI(messages, ragContext);
     // Ответ-заготовка к базовому знанию не относится — не ищем в нём источник.
-    res.json({ reply, sources: reply === DEFAULT_ANSWER ? [] : sources });
+    respond(
+      { reply, sources: reply === DEFAULT_ANSWER ? [] : sources },
+      {
+        is_fallback: fallback,
+        tokens_in: usage?.in ?? null,
+        tokens_out: usage?.out ?? null,
+        cost_usd: usage ? analytics.costUsd(MODEL, usage.in, usage.out) : null,
+      }
+    );
   } catch (err) {
     const status = err?.status ?? err?.response?.status;
     console.error(`[/api/chat] ${status ?? ''} ${err?.message ?? err}`);
@@ -277,7 +308,7 @@ app.post('/api/chat', rateLimit, async (req, res) => {
     if (status === 401 || status === 403) {
       return res.status(502).json({ error: 'ai_auth', message: 'Проверьте OPENAI_API_KEY на сервере.' });
     }
-    res.json({ reply: DEFAULT_ANSWER, sources: [], degraded: true });
+    respond({ reply: DEFAULT_ANSWER, sources: [], degraded: true });
   }
 });
 
@@ -389,6 +420,7 @@ module.exports = { app, normalizeMessages, DEFAULT_ANSWER, NO_ANSWER };
 if (require.main === module) {
   auth.ensureAdmin();
   auth.startSessionCleanup();
+  analytics.initDb();
 
   const server = app.listen(PORT, () => {
     console.log(`☕ Coffee Point → http://localhost:${PORT}`);
