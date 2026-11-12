@@ -298,3 +298,96 @@ def get_top_gaps() -> pd.DataFrame:
     except Exception:  # noqa: BLE001
         return pd.DataFrame(columns=["rank", "gap_title", "count", "example_1", "example_2"])
 
+
+def get_eval_summary() -> pd.DataFrame:
+    """Сводка замеров До/После (before vs after) по всем вопросам и отдельно для known и gap."""
+    sql = """
+        SELECT
+            run_label,
+            "group" AS grp,
+            COUNT(*) AS n,
+            SUM(CASE WHEN verdict = 'ok' THEN 1 ELSE 0 END) AS ok_cnt,
+            SUM(CASE WHEN verdict = 'partial' THEN 1 ELSE 0 END) AS partial_cnt,
+            SUM(CASE WHEN verdict = 'fail' THEN 1 ELSE 0 END) AS fail_cnt
+        FROM eval_results
+        WHERE run_label IN ('before', 'after')
+        GROUP BY run_label, "group"
+    """
+    try:
+        with _ro_connect() as conn:
+            raw = pd.read_sql_query(sql, conn)
+    except Exception:  # noqa: BLE001
+        return pd.DataFrame()
+    if raw.empty:
+        return pd.DataFrame()
+
+    rows = []
+    for label in ("before", "after"):
+        sub_l = raw[raw["run_label"] == label]
+        if sub_l.empty:
+            continue
+        for scope, title in [("all", "Все вопросы"), ("known", "Известные (known)"), ("gap", "Пробелы (gap)")]:
+            s = sub_l if scope == "all" else sub_l[sub_l["grp"] == scope]
+            n = int(s["n"].sum())
+            if not n:
+                continue
+            ok = int(s["ok_cnt"].sum())
+            part = int(s["partial_cnt"].sum())
+            fail = int(s["fail_cnt"].sum())
+            rows.append(
+                {
+                    "run_label": label,
+                    "scope": title,
+                    "n": n,
+                    "ok_cnt": ok,
+                    "ok_pct": round(100.0 * ok / n, 1),
+                    "partial_cnt": part,
+                    "partial_pct": round(100.0 * part / n, 1),
+                    "fail_cnt": fail,
+                    "fail_pct": round(100.0 * fail / n, 1),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def get_eval_changes() -> pd.DataFrame:
+    """Повопросное сравнение before и after (где стало лучше / хуже)."""
+    sql = """
+        SELECT
+            b.question_id,
+            b."group" AS grp,
+            b.verdict AS verdict_before,
+            a.verdict AS verdict_after,
+            b.reason AS reason_before,
+            a.reason AS reason_after
+        FROM eval_results b
+        JOIN eval_results a
+          ON a.question_id = b.question_id AND a.run_label = 'after'
+        WHERE b.run_label = 'before'
+        ORDER BY b.question_id
+    """
+    try:
+        with _ro_connect() as conn:
+            df = pd.read_sql_query(sql, conn)
+    except Exception:  # noqa: BLE001
+        return pd.DataFrame()
+    if df.empty:
+        return df
+
+    q_path = db.ROOT / "tests" / "test_questions.csv"
+    if q_path.exists():
+        q_df = pd.read_csv(q_path)[["id", "question"]].rename(columns={"id": "question_id"})
+        df = df.merge(q_df, on="question_id", how="left")
+    else:
+        df["question"] = ""
+
+    score_map = {"fail": 0, "partial": 1, "ok": 2}
+    s_before = df["verdict_before"].map(score_map).fillna(0)
+    s_after = df["verdict_after"].map(score_map).fillna(0)
+    df["delta"] = s_after - s_before
+    df["status"] = df["delta"].map(
+        lambda d: "Стало лучше" if d > 0 else ("Стало хуже" if d < 0 else "Без изменений")
+    )
+    return df[["question_id", "grp", "question", "verdict_before", "verdict_after", "status", "reason_after"]]
+
+

@@ -51,6 +51,8 @@ def load_dashboard_data(
         "funnel": queries.get_funnel(date_from, date_to, channel),
         "cost_by_day": queries.get_avg_cost_by_day(date_from, date_to, channel),
         "gaps": queries.get_top_gaps(),
+        "eval_summary": queries.get_eval_summary(),
+        "eval_changes": queries.get_eval_changes(),
     }
 
 
@@ -204,6 +206,62 @@ def main() -> None:
             width="stretch",
             hide_index=True,
         )
+
+    st.divider()
+    st.subheader("7. Сравнение качества бота «До / После» (eval_results)")
+    eval_sum = data["eval_summary"].copy()
+    eval_chg = data["eval_changes"].copy()
+    if eval_sum.empty:
+        st.info("Замеры `before` / `after` ещё не проведены. Запустите `scripts/run_eval.py`.")
+    else:
+        c_ev1, c_ev2 = st.columns(2)
+        with c_ev1:
+            st.markdown("**Доли `ok` / `partial` / `fail` по группам (%)**")
+            st.dataframe(
+                eval_sum.rename(
+                    columns={
+                        "run_label": "Замер",
+                        "scope": "Выборка",
+                        "n": "N",
+                        "ok_cnt": "ok",
+                        "ok_pct": "ok, %",
+                        "partial_cnt": "partial",
+                        "partial_pct": "partial, %",
+                        "fail_cnt": "fail",
+                        "fail_pct": "fail, %",
+                    }
+                ),
+                width="stretch",
+                hide_index=True,
+            )
+        with c_ev2:
+            st.markdown("**Рост доли `ok` (%) До vs После**")
+            piv = eval_sum.pivot(index="scope", columns="run_label", values="ok_pct")
+            cols_order = [c for c in ("before", "after") if c in piv.columns]
+            st.bar_chart(piv[cols_order])
+
+        if not eval_chg.empty:
+            better = eval_chg[eval_chg["status"] == "Стало лучше"]
+            worse = eval_chg[eval_chg["status"] == "Стало хуже"]
+            st.markdown(
+                f"**Изменения по вопросам:** стало лучше — **{len(better)}**, "
+                f"стало хуже — **{len(worse)}**, без изменений — **{len(eval_chg) - len(better) - len(worse)}**."
+            )
+            st.dataframe(
+                eval_chg.rename(
+                    columns={
+                        "question_id": "ID",
+                        "grp": "Группа",
+                        "question": "Вопрос",
+                        "verdict_before": "До (before)",
+                        "verdict_after": "После (after)",
+                        "status": "Динамика",
+                        "reason_after": "Комментарий судьи (after)",
+                    }
+                ),
+                width="stretch",
+                hide_index=True,
+            )
 
 
 if __name__ == "__main__":
