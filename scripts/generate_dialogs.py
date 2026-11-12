@@ -43,6 +43,11 @@ RATING_SHARE = 0.35          # доля диалогов с оценкой
 COMPLAINT_HANDOFF = 0.5      # доля жалоб, переданных менеджеру
 MAX_USER_TURNS = 3           # 1..3 реплики клиента => 2..6 сообщений в диалоге
 
+# Токены/стоимость синтетических ответов бота — ОЦЕНКА (бот не вызывался).
+CHAT_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")  # модель, цену которой применяем
+FALLBACK_PROMPT_TOKENS = 1850  # замер tokens_in реального ответа бота в Фазе 1
+CHARS_PER_TOKEN = 3            # грубо для русского текста с разметкой
+
 # Оценка токенов для режима без --run (грубая, по выводу сессии с реальным ботом)
 EST_PROMPT_OVERHEAD = 1000   # инструкция + спецификация батча, токенов
 EST_OUT_PER_DIALOG = 200
@@ -136,6 +141,9 @@ def valid(dialog: dict, spec: dict) -> bool:
             return False
     if msgs[-1]["role"] != "assistant":
         return False
+    # Служебные метки, кроме нашей [[NO_ANSWER]], в тексте недопустимы (модель любит вставлять [[OUT_OF_SCOPE]]).
+    if any("[[" in m["text"].replace("[[NO_ANSWER]]", "") for m in msgs):
+        return False
     has_gap = any("[[NO_ANSWER]]" in m["text"] for m in msgs)
     return has_gap if spec["category"] == "no_answer" else not has_gap
 
@@ -168,7 +176,16 @@ def iso(dt: datetime) -> str:
     return dt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
 
-def save(conn: sqlite3.Connection, spec: dict, dialog: dict, rng: random.Random, now: datetime) -> None:
+def real_prompt_base(conn: sqlite3.Connection) -> int:
+    """Медиана tokens_in у настоящих ответов бота; иначе значение, замеренное вручную в Фазе 1."""
+    rows = [r[0] for r in conn.execute(
+        "SELECT m.tokens_in FROM messages m JOIN conversations c ON c.id = m.conversation_id "
+        "WHERE m.tokens_in IS NOT NULL AND c.session_id NOT LIKE 'gen\\_%' ESCAPE '\\' ORDER BY m.tokens_in"
+    )]
+    return rows[len(rows) // 2] if rows else FALLBACK_PROMPT_TOKENS
+
+
+def save(conn: sqlite3.Connection, spec: dict, dialog: dict, rng: random.Random, now: datetime, base_in: int) -> None:
     started = now - timedelta(seconds=rng.randint(0, DAYS * 86400))
     cat = spec["category"]
     channel = "telegram" if rng.random() < CHANNEL_SHARE_TELEGRAM else "website"
@@ -183,13 +200,23 @@ def save(conn: sqlite3.Connection, spec: dict, dialog: dict, rng: random.Random,
         (f"gen_{channel[:2]}_{spec['i']:04d}", channel, iso(started), rating, int(handed), int(lead)),
     )
     t = started
+    history_chars = 0
     for m in dialog["messages"]:
         t += timedelta(seconds=rng.randint(5, 90))
         fallback = m["role"] == "assistant" and "[[NO_ANSWER]]" in m["text"]
         text = NO_ANSWER if fallback else m["text"].strip()
+        t_in = t_out = c = None
+        if m["role"] == "assistant" and not fallback:
+            # ОЦЕНКА, не замер: бота реально не вызывали. Вход = типичный промпт бота
+            # + история диалога, выход = длина ответа. Fallback по порогу модель не вызывает.
+            t_in = base_in + history_chars // CHARS_PER_TOKEN
+            t_out = max(1, len(text) // CHARS_PER_TOKEN)
+            c = db.cost_usd(CHAT_MODEL, t_in, t_out)
+        history_chars += len(text)
         conn.execute(
-            "INSERT INTO messages (conversation_id, role, text, created_at, is_fallback) VALUES (?, ?, ?, ?, ?)",
-            (cur.lastrowid, m["role"], text, iso(t), int(fallback)),
+            """INSERT INTO messages (conversation_id, role, text, created_at, is_fallback,
+                                     tokens_in, tokens_out, cost_usd) VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            (cur.lastrowid, m["role"], text, iso(t), int(fallback), t_in, t_out, c),
         )
 
 
@@ -236,6 +263,8 @@ def main() -> None:
         conn.commit()
 
     now = datetime.now(timezone.utc)
+    base_in = real_prompt_base(conn)
+    print(f"Оценочный промпт бота для токенов синтетики: {base_in}")
     seen: set[str] = set()
     saved = rejected = tok_in = tok_out = 0
     for n, specs in enumerate(batches, 1):
@@ -251,7 +280,7 @@ def main() -> None:
                     rejected += 1
                     continue
                 seen.add(first)
-                save(conn, spec, d, rng, now)
+                save(conn, spec, d, rng, now, base_in)
                 saved += 1
                 by_i.pop(d["i"])
     cost = db.cost_usd(MODEL, tok_in, tok_out)

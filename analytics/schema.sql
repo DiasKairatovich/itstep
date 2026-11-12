@@ -42,3 +42,26 @@ CREATE INDEX IF NOT EXISTS idx_conversations_started ON conversations(started_at
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_messages_created      ON messages(created_at);
 CREATE INDEX IF NOT EXISTS idx_analysis_conversation ON conversation_analysis(conversation_id);
+
+CREATE TABLE IF NOT EXISTS knowledge_gaps (
+  rank        INTEGER PRIMARY KEY,
+  gap_title   TEXT    NOT NULL,
+  count       INTEGER NOT NULL,
+  example_1   TEXT    NOT NULL,
+  example_2   TEXT    NOT NULL,
+  updated_at  TEXT    NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS eval_results (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  run_label   TEXT    NOT NULL,                -- before | after
+  question_id INTEGER NOT NULL,
+  "group"     TEXT    NOT NULL,                -- known | gap
+  answer      TEXT    NOT NULL,
+  verdict     TEXT    NOT NULL,                -- ok | partial | fail
+  reason      TEXT    NOT NULL,
+  created_at  TEXT    NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_eval_results_label ON eval_results(run_label);
+
